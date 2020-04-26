@@ -1,11 +1,15 @@
 package com.claire.firstspring.model;
 
-import org.springframework.stereotype.Service;
-
-@Service
 public class SimpleRestaurant implements Restaurant {
+
+    private final Menu menu;
+
+    public SimpleRestaurant(Menu menu) {
+        this.menu = menu;
+    }
+
     @Override
     public Menu menu() {
-        return new HolidayMenu();
+        return menu;
     }
 }

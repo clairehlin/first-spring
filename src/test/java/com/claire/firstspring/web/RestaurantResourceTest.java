@@ -1,16 +1,14 @@
 package com.claire.firstspring.web;
 
+import com.claire.firstspring.model.Menu;
 import com.claire.firstspring.model.Restaurant;
-import com.claire.firstspring.model.SimpleRestaurant;
 import com.claire.firstspring.service.RestaurantService;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RestaurantResourceTest {
 
@@ -18,8 +16,8 @@ class RestaurantResourceTest {
     void can_get_list_of_restaurants() {
         //given
         List<Restaurant> expectedRestaurants = asList(
-                new SimpleRestaurant(),
-                new SimpleRestaurant()
+                new TestRestaurant(),
+                new TestRestaurant()
         );
         RestaurantService restaurantService = new TestRestaurantService(expectedRestaurants);
 
@@ -31,6 +29,14 @@ class RestaurantResourceTest {
         assertThat(restaurants)
                 .hasSize(2)
                 .containsExactlyElementsOf(expectedRestaurants);
+    }
+
+    private static class TestRestaurant implements Restaurant{
+
+        @Override
+        public Menu menu() {
+            return null;
+        }
     }
 
     private static class TestRestaurantService implements RestaurantService {
