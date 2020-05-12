@@ -31,7 +31,12 @@ class RestaurantResourceTest {
                 .containsExactlyElementsOf(expectedRestaurants);
     }
 
-    private static class TestRestaurant implements Restaurant{
+    private static class TestRestaurant implements Restaurant {
+
+        @Override
+        public String name() {
+            return null;
+        }
 
         @Override
         public Menu menu() {
