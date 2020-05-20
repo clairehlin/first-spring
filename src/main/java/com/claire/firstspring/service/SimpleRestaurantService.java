@@ -1,9 +1,7 @@
 package com.claire.firstspring.service;
 
-import com.claire.firstspring.model.HolidayMenu;
 import com.claire.firstspring.model.Restaurant;
-import com.claire.firstspring.model.SimpleRestaurant;
-import com.claire.firstspring.repository.SimpleRestaurantRepository;
+import com.claire.firstspring.repository.RestaurantRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,13 +9,20 @@ import java.util.List;
 @Service
 public class SimpleRestaurantService implements RestaurantService {
 
+    private final RestaurantRepository restaurantRepository;
+
+    public SimpleRestaurantService(RestaurantRepository restaurantRepository){
+        this.restaurantRepository = restaurantRepository;
+    }
+
     @Override
     public List<Restaurant> list() {
-        HolidayMenu holidayMenu = new HolidayMenu();
-        return List.of(
-                new SimpleRestaurant("Ruth", holidayMenu),
-                new SimpleRestaurant("name", holidayMenu),
-                new SimpleRestaurant("name", holidayMenu)
-        );
+       return restaurantRepository.restaurants();
+    }
+
+    @Override
+    public Restaurant get(Integer id) {
+        return restaurantRepository.restaurant(id)
+                .orElseThrow();
     }
 }

@@ -1,8 +1,12 @@
 package com.claire.firstspring.model;
 
-import java.util.List;
+import java.util.Set;
 
 public interface Menu {
 
-    List<Section> sections();
+    Integer id();
+
+    String name();
+
+    Set<Section> sections();
 }

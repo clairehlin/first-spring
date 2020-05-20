@@ -6,6 +6,7 @@ import com.claire.firstspring.service.RestaurantService;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,12 +35,17 @@ class RestaurantResourceTest {
     private static class TestRestaurant implements Restaurant {
 
         @Override
+        public Integer id() {
+            return null;
+        }
+
+        @Override
         public String name() {
             return null;
         }
 
         @Override
-        public Menu menu() {
+        public Set<Menu> menus() {
             return null;
         }
     }
@@ -54,6 +60,11 @@ class RestaurantResourceTest {
         @Override
         public List<Restaurant> list() {
             return expectedRestaurants;
+        }
+
+        @Override
+        public Restaurant get(Integer id) {
+            return null;
         }
     }
 }

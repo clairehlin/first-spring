@@ -2,16 +2,15 @@ package com.claire.firstspring.model;
 
 import java.util.Set;
 
-public class SimpleRestaurant implements Restaurant {
-
+public class SimpleMenu implements Menu {
     private final Integer id;
     private final String name;
-    private final Set<Menu> menus;
+    private final Set<Section> sections;
 
-    public SimpleRestaurant(Integer id, String name, Set<Menu> menus) {
+    public SimpleMenu(Integer id, String name, Set<Section> sections) {
         this.id = id;
         this.name = name;
-        this.menus = menus;
+        this.sections = sections;
     }
 
     @Override
@@ -25,8 +24,7 @@ public class SimpleRestaurant implements Restaurant {
     }
 
     @Override
-    public Set<Menu> menus() {
-        return menus;
+    public Set<Section> sections() {
+        return sections;
     }
-
 }

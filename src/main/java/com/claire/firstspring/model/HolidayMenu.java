@@ -1,6 +1,7 @@
 package com.claire.firstspring.model;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.claire.firstspring.model.Feature.GlutenFree;
 import static com.claire.firstspring.model.Feature.Keto;
@@ -17,8 +18,20 @@ public class HolidayMenu implements Menu {
     private final Section salads = new SimpleSection("Salads", saladItems());
 
     @Override
-    public List<Section> sections() {
-        return asList(appetizers, sandwiches, salads);
+    public Integer id() {
+        return null;
+    }
+
+    @Override
+    public String name() {
+        return null;
+    }
+
+    @Override
+    public Set<Section> sections() {
+        return Set.copyOf(
+                asList(appetizers, sandwiches, salads)
+        );
     }
 
     private List<Item> saladItems() {

@@ -37,5 +37,7 @@ public class PersistenceConfig {
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
+
+    public void mango(){}
 }
 

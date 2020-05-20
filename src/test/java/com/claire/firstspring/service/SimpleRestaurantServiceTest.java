@@ -1,7 +1,12 @@
-package com.claire.firstspring.repository;
+package com.claire.firstspring.service;
 
 import com.claire.firstspring.config.PersistenceConfig;
-import com.claire.firstspring.model.Restaurant;
+import com.claire.firstspring.repository.MenuRowMapper;
+import com.claire.firstspring.repository.RestaurantRowMapper;
+import com.claire.firstspring.repository.SectionRowMapper;
+import com.claire.firstspring.repository.SimpleMenuRepository;
+import com.claire.firstspring.repository.SimpleRestaurantRepository;
+import com.claire.firstspring.repository.SimpleSectionRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,19 +22,16 @@ import org.springframework.test.context.TestPropertySource;
 
 import javax.sql.DataSource;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ContextConfiguration(
-        classes = {SimpleRestaurantRepositoryTest.TestDataSource.class}
+        classes = {SimpleRestaurantServiceTest.TestDataSource.class}
 )
 @TestPropertySource(
         properties = "spring.main.allow-bean-definition-overriding=true"
 )
-class SimpleRestaurantRepositoryTest {
-
+class SimpleRestaurantServiceTest {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
@@ -37,31 +39,20 @@ class SimpleRestaurantRepositoryTest {
     SimpleRestaurantRepository simpleRestaurantRepository;
 
     @Test
-    void can_read_restaurants_from_repo() {
-        final List<Restaurant> restaurants = simpleRestaurantRepository.restaurants();
-        assertThat(restaurants)
-                .hasSize(2)
-                .isNotEmpty()
-                .extracting(Restaurant::name)
-                .containsExactlyInAnyOrder("Ruth Steakhouse", "Sam Steakhouse");
-    }
-
-    @Test
-    void can_return_a_restaurant_with_id() {
-        assertThat(simpleRestaurantRepository.restaurant(2))
-                .isNotEmpty();
+    void can_get_a_list_of_restaurants(){
+        SimpleRestaurantService simpleRestaurantService = new SimpleRestaurantService(simpleRestaurantRepository);
+        assertThat(simpleRestaurantService.list())
+                .hasSize(2);
     }
 
     @Configuration
-    @Import({
-            PersistenceConfig.class,
+    @Import({PersistenceConfig.class,
             SimpleRestaurantRepository.class,
             RestaurantRowMapper.class,
             SimpleMenuRepository.class,
             MenuRowMapper.class,
             SimpleSectionRepository.class,
-            SectionRowMapper.class
-    })
+            SectionRowMapper.class})
     static class TestDataSource {
         @Bean
         @Primary
