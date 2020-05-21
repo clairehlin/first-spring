@@ -60,7 +60,8 @@ class SimpleRestaurantRepositoryTest {
             SimpleMenuRepository.class,
             MenuRowMapper.class,
             SimpleSectionRepository.class,
-            SectionRowMapper.class
+            SectionRowMapper.class,
+            SimpleItemRepository.class
     })
     static class TestDataSource {
         @Bean

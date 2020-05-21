@@ -23,22 +23,21 @@ public class SimpleSectionRepository implements SectionRepository {
 
     @Override
     public List<Section> sections() {
-        final List<Section> sections = jdbcTemplate.query(
+        return jdbcTemplate.query(
                 "SELECT * FROM sections LIMIT 101",
                 sectionRowMapper
         );
-        return sections;
     }
 
-//    @Override
-//    public Optional<Section> section(Integer id) {
-//        Section section = jdbcTemplate.queryForObject(
-//                "SELECT * FROM menu WHERE id = ?",
-//                toArray(id),
-//                sectionRowMapper
-//        );
-//        return Optional.ofNullable(section);
-//    }
+    @Override
+    public Optional<Section> section(Integer id) {
+        Section section = (Section) jdbcTemplate.queryForObject(
+                "SELECT * FROM section WHERE id = ?",
+                toArray(id),
+                sectionRowMapper
+        );
+        return Optional.ofNullable(section);
+    }
 
     @Override
     public List<Section> menuSections(Integer menuId) {

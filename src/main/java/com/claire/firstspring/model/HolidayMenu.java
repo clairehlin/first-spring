@@ -13,9 +13,10 @@ import static org.apache.commons.collections4.SetUtils.hashSet;
 
 public class HolidayMenu implements Menu {
 
-    private final Section appetizers = new SimpleSection("Appetizers", appetizerItems());
-    private final Section sandwiches = new SimpleSection("Sandwiches", sandwichItems());
-    private final Section salads = new SimpleSection("Salads", saladItems());
+    private Integer id;
+    private final Section appetizers = new SimpleSection(id, "Appetizers", appetizerItems());
+    private final Section sandwiches = new SimpleSection(id, "Sandwiches", sandwichItems());
+    private final Section salads = new SimpleSection(id, "Salads", saladItems());
 
     @Override
     public Integer id() {

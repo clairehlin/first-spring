@@ -9,7 +9,7 @@ public interface SectionRepository {
 
     List<Section> sections();
 
-//    Optional<Section> section(Integer id);
+    Optional<Section> section(Integer id);
 
     List<Section> menuSections(Integer id);
 

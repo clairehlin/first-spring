@@ -4,6 +4,7 @@ import com.claire.firstspring.config.PersistenceConfig;
 import com.claire.firstspring.repository.MenuRowMapper;
 import com.claire.firstspring.repository.RestaurantRowMapper;
 import com.claire.firstspring.repository.SectionRowMapper;
+import com.claire.firstspring.repository.SimpleItemRepository;
 import com.claire.firstspring.repository.SimpleMenuRepository;
 import com.claire.firstspring.repository.SimpleRestaurantRepository;
 import com.claire.firstspring.repository.SimpleSectionRepository;
@@ -52,7 +53,9 @@ class SimpleRestaurantServiceTest {
             SimpleMenuRepository.class,
             MenuRowMapper.class,
             SimpleSectionRepository.class,
-            SectionRowMapper.class})
+            SectionRowMapper.class,
+            SimpleItemRepository.class
+    })
     static class TestDataSource {
         @Bean
         @Primary
