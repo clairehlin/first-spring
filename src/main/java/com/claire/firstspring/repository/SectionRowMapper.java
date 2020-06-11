@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Component
-public class SectionRowMapper implements RowMapper {
+public class SectionRowMapper implements RowMapper<Section> {
     private final ItemRepository itemRepository;
 
     public SectionRowMapper(ItemRepository itemRepository) {
@@ -21,9 +21,9 @@ public class SectionRowMapper implements RowMapper {
         Integer id = rs.getInt("id");
         String name = rs.getString("name");
         return new SimpleSection(
-                id,
-                name,
-                itemRepository.sectionItems(id)
+            id,
+            name,
+            itemRepository.sectionItems(id)
         );
     }
 }

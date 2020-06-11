@@ -22,9 +22,9 @@ public class RestaurantRowMapper implements RowMapper<Restaurant> {
         Integer id = rs.getInt("id");
         String name = rs.getString("name");
         return new SimpleRestaurant(
-                id,
-                name,
-                Set.copyOf(menuRepository.restaurantMenus(id))
+            id,
+            name,
+            Set.copyOf(menuRepository.restaurantMenus(id))
         );
     }
 }

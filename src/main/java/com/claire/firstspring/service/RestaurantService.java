@@ -8,4 +8,6 @@ public interface RestaurantService {
     List<Restaurant> list();
 
     Restaurant get(Integer id);
+
+    Restaurant addRestaurant(Restaurant restaurant);
 }

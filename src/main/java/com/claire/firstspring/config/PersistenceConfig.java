@@ -22,6 +22,9 @@ public class PersistenceConfig {
     @Value("${database.password}")
     private String databasePassword;
 
+    @Value("${spring.flyway.default-schema:menu_db}")
+    private String schema;
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -34,10 +37,13 @@ public class PersistenceConfig {
     }
 
     @Bean
+    public String schema() {
+        return '\"' + schema + '\"';
+    }
+
+    @Bean
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
-
-    public void mango(){}
 }
 

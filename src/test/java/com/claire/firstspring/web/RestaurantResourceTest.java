@@ -17,8 +17,8 @@ class RestaurantResourceTest {
     void can_get_list_of_restaurants() {
         //given
         List<Restaurant> expectedRestaurants = asList(
-                new TestRestaurant(),
-                new TestRestaurant()
+            new TestRestaurant(),
+            new TestRestaurant()
         );
         RestaurantService restaurantService = new TestRestaurantService(expectedRestaurants);
 
@@ -28,8 +28,8 @@ class RestaurantResourceTest {
 
         //then
         assertThat(restaurants)
-                .hasSize(2)
-                .containsExactlyElementsOf(expectedRestaurants);
+            .hasSize(2)
+            .containsExactlyElementsOf(expectedRestaurants);
     }
 
     private static class TestRestaurant implements Restaurant {
@@ -65,6 +65,11 @@ class RestaurantResourceTest {
         @Override
         public Restaurant get(Integer id) {
             return null;
+        }
+
+        @Override
+        public Restaurant addRestaurant(Restaurant restaurant) {
+            throw new UnsupportedOperationException();
         }
     }
 }

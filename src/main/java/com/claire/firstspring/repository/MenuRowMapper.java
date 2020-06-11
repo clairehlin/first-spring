@@ -22,8 +22,8 @@ public class MenuRowMapper implements RowMapper<Menu> {
         Integer id = rs.getInt("id");
         String name = rs.getString("name");
         return new SimpleMenu(
-                id,
-                name,
-                Set.copyOf(sectionRepository.menuSections(id)));
+            id,
+            name,
+            Set.copyOf(sectionRepository.menuSections(id)));
     }
 }

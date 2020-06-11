@@ -25,6 +25,8 @@ CREATE TABLE section (
 CREATE TABLE item (
     id INT NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    price DOUBLE(2) NOT NULL,
     section_id INT NOT NULL,
     CONSTRAINT section_id_item_id UNIQUE (section_id, id),
     CONSTRAINT FK_item_section FOREIGN KEY (section_id) REFERENCES section(id),

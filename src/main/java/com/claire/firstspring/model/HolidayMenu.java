@@ -31,54 +31,54 @@ public class HolidayMenu implements Menu {
     @Override
     public Set<Section> sections() {
         return Set.copyOf(
-                asList(appetizers, sandwiches, salads)
+            asList(appetizers, sandwiches, salads)
         );
     }
 
     private List<Item> saladItems() {
         final SimpleItem silverStarCobb = new SimpleItem(
-                "Silver Star Cobb",
-                "avocado bacon blue cheese",
-                14.0,
-                hashSet(GlutenFree, Keto)
+            id, "Silver Star Cobb",
+            "avocado bacon blue cheese",
+            14.0,
+            hashSet(GlutenFree, Keto)
         );
         final SimpleItem strawberryPecan = new SimpleItem(
-                "Strawberry Pecan",
-                "spring mixed greens with freshly sliced strawberries and candied pecans",
-                13.0,
-                hashSet(Vegetarian)
+            id, "Strawberry Pecan",
+            "spring mixed greens with freshly sliced strawberries and candied pecans",
+            13.0,
+            hashSet(Vegetarian)
         );
         return asList(silverStarCobb, strawberryPecan);
     }
 
     private List<Item> sandwichItems() {
         final SimpleItem cheeseBurger = new SimpleItem(
-                "Cheese Burger",
-                "Certified Angus beef topped with American cheese",
-                11.0,
-                emptySet()
+            id, "Cheese Burger",
+            "Certified Angus beef topped with American cheese",
+            11.0,
+            emptySet()
         );
         final SimpleItem smokedTurkey = new SimpleItem(
-                "Smoked Turkey",
-                "turkey breast with bistro sauce",
-                10.0,
-                hashSet(Spicy)
+            id, "Smoked Turkey",
+            "turkey breast with bistro sauce",
+            10.0,
+            hashSet(Spicy)
         );
         return asList(cheeseBurger, smokedTurkey);
     }
 
     private List<Item> appetizerItems() {
         final SimpleItem warmMozzarella = new SimpleItem(
-                "Warm Mozzarella",
-                "creamy cheese baked and topped with reduction",
-                15.0,
-                hashSet(GlutenFree, Spicy)
+            id, "Warm Mozzarella",
+            "creamy cheese baked and topped with reduction",
+            15.0,
+            hashSet(GlutenFree, Spicy)
         );
         final SimpleItem jumboCrabClaws = new SimpleItem(
-                "Jumbo Crab Claws",
-                "claws marinated with signature sauce",
-                19.0,
-                emptySet()
+            id, "Jumbo Crab Claws",
+            "claws marinated with signature sauce",
+            19.0,
+            emptySet()
         );
         return asList(warmMozzarella, jumboCrabClaws);
     }
@@ -86,7 +86,7 @@ public class HolidayMenu implements Menu {
     @Override
     public String toString() {
         return "HolidayMenu{" +
-                sections() +
-                "}";
+            sections() +
+            "}";
     }
 }

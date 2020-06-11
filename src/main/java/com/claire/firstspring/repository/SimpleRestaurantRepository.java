@@ -1,11 +1,15 @@
 package com.claire.firstspring.repository;
 
+import com.claire.firstspring.model.Menu;
 import com.claire.firstspring.model.Restaurant;
+import com.claire.firstspring.model.SimpleRestaurant;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.apache.commons.lang3.ArrayUtils.toArray;
 
@@ -14,22 +18,29 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final RestaurantRowMapper restaurantRowMapper;
+    private final String schema;
+    private final IdGeneratingRepository idGeneratingRepository;
+    private final MenuRepository menuRepository;
 
-    public SimpleRestaurantRepository(JdbcTemplate jdbcTemplate, RestaurantRowMapper restaurantRowMapper) {
+
+    public SimpleRestaurantRepository(JdbcTemplate jdbcTemplate, RestaurantRowMapper restaurantRowMapper, String schema, IdGeneratingRepository idGeneratingRepository, MenuRepository menuRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.restaurantRowMapper = restaurantRowMapper;
+        this.schema = schema;
+        this.idGeneratingRepository = idGeneratingRepository;
+        this.menuRepository = menuRepository;
     }
 
     @Override
     public List<Restaurant> restaurants() {
         final List<Restaurant> restaurants = jdbcTemplate.query(
-                "SELECT * FROM restaurant LIMIT 101",
-                restaurantRowMapper
+            String.format("SELECT * FROM %s.restaurant LIMIT 101", schema),
+            restaurantRowMapper
         );
-        if(restaurants.size() > 100) {
+        if (restaurants.size() > 100) {
             final Integer restaurantCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM restaurant",
-                    Integer.class
+                String.format("SELECT COUNT(*) FROM %s.restaurant", schema),
+                Integer.class
             );
             throw new RuntimeException("too many rows of restaurants in database: " + restaurantCount);
         }
@@ -39,24 +50,77 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
     @Override
     public Optional<Restaurant> restaurant(Integer id) {
         List<Restaurant> listOfRestaurant = jdbcTemplate.query(
-                "SELECT * FROM restaurant LIMIT 101",
-                restaurantRowMapper
+            String.format("SELECT * FROM %s.restaurant LIMIT 101", schema),
+            restaurantRowMapper
         );
-        if(listOfRestaurant.size() > 100) {
+        if (listOfRestaurant.size() > 100) {
             throw new RuntimeException("too many rows of restaurants in database");
         }
         return listOfRestaurant
-                .stream()
-                .filter(r -> r.id().equals(id))
-                .findFirst();
+            .stream()
+            .filter(r -> r.id().equals(id))
+            .findFirst();
+    }
+
+    @Override
+    public Restaurant create(Restaurant restaurant) {
+        final int restaurantId = idGeneratingRepository.nextId(this);
+        String name = restaurant.name();
+
+        jdbcTemplate.update(
+            String.format("INSERT INTO %s.restaurant (id, name) VALUES (?, ?)", schema),
+            restaurantId,
+            name
+        );
+
+        return new SimpleRestaurant(
+            restaurantId,
+            name,
+            createdMenus(restaurantId, restaurant.menus())
+        );
+    }
+
+    private Set<Menu> createdMenus(int restaurantId, Set<Menu> menus) {
+        Set<Menu> createdMenus = new HashSet<>();
+
+        for (Menu menu : menus) {
+            final Menu menuWithId = menuRepository.create(restaurantId, menu);
+            createdMenus.add(menuWithId);
+        }
+
+        return createdMenus;
     }
 
     public Optional<Restaurant> restaurant2(Integer id) {
         Restaurant restaurant = jdbcTemplate.queryForObject(
-                "SELECT * FROM restaurant WHERE id = ?",
-                toArray(id),
-                restaurantRowMapper
+            String.format("SELECT * FROM %s.restaurant WHERE id = ?", schema),
+            toArray(id),
+            restaurantRowMapper
         );
         return Optional.ofNullable(restaurant);
     }
+
+    @Override
+    public String getMainTableName() {
+        return String.format("%s.restaurant", schema);
+    }
+
+    /*
+    method called : queryForObject()
+    number of parameters: 3
+    parameters: String, Array, RowMapper
+
+    method called: format()
+    number of parameters: 2
+    parameters: String, varargs Objects
+
+    method called: toArray()
+    number of parameters: 1
+    parameters: varargs T
+
+    method called: ofNullable()
+    number of parameters: 1
+    parameters: T
+
+     */
 }

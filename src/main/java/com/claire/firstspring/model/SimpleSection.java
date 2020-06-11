@@ -34,8 +34,8 @@ public class SimpleSection implements Section {
     @Override
     public String toString() {
         return "SimpleSection{" +
-                "sectionName='" + sectionName + '\'' +
-                ", items=" + items +
-                '}';
+            "sectionName='" + sectionName + '\'' +
+            ", items=" + items +
+            '}';
     }
 }

@@ -2,30 +2,35 @@ package com.claire.firstspring.model;
 
 import java.util.Set;
 
-import static java.util.Collections.unmodifiableSet;
+public class SimpleItem implements Item {
 
-public class SimpleItem implements Item{
-
-    private final String itemName;
-    private final String itemDescription;
+    private final Integer id;
+    private final String name;
+    private final String description;
     private final double price;
     private final Set<Feature> features;
 
-    public SimpleItem(String itemName, String itemDescription, double price, Set<Feature> features) {
-        this.itemName = itemName;
-        this.itemDescription = itemDescription;
+    public SimpleItem(Integer id, String name, String description, double price, Set<Feature> features) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
         this.price = price;
-        this.features = features;
+        this.features = Set.copyOf(features);
+    }
+
+    @Override
+    public Integer id() {
+        return id;
     }
 
     @Override
     public String name() {
-        return itemName;
+        return name;
     }
 
     @Override
     public String description() {
-        return itemDescription;
+        return description;
     }
 
     @Override
@@ -35,16 +40,16 @@ public class SimpleItem implements Item{
 
     @Override
     public Set<Feature> features() {
-        return unmodifiableSet(features);
+        return Set.copyOf(features);
     }
 
     @Override
     public String toString() {
         return "SimpleItem{" +
-                "itemName='" + itemName + '\'' +
-                ", itemDescription='" + itemDescription + '\'' +
-                ", price=" + price +
-                ", features=" + features +
-                '}';
+            "name='" + name + '\'' +
+            ", description='" + description + '\'' +
+            ", price=" + price +
+            ", features=" + features +
+            '}';
     }
 }

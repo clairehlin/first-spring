@@ -1,11 +1,12 @@
 package com.claire.firstspring.repository;
 
 import com.claire.firstspring.model.Section;
+import org.springframework.boot.autoconfigure.integration.IntegrationAutoConfiguration;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface SectionRepository {
+public interface SectionRepository extends MainTableAwareRepository {
 
     List<Section> sections();
 
@@ -13,4 +14,5 @@ public interface SectionRepository {
 
     List<Section> menuSections(Integer id);
 
+    Section create(Integer menuId, Section section);
 }

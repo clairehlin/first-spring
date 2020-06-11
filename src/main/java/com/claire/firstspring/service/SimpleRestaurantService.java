@@ -11,18 +11,25 @@ public class SimpleRestaurantService implements RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
 
-    public SimpleRestaurantService(RestaurantRepository restaurantRepository){
+    public SimpleRestaurantService(
+        RestaurantRepository restaurantRepository
+    ) {
         this.restaurantRepository = restaurantRepository;
     }
 
     @Override
     public List<Restaurant> list() {
-       return restaurantRepository.restaurants();
+        return restaurantRepository.restaurants();
     }
 
     @Override
     public Restaurant get(Integer id) {
         return restaurantRepository.restaurant(id)
-                .orElseThrow();
+            .orElseThrow();
+    }
+
+    @Override
+    public Restaurant addRestaurant(Restaurant restaurant) {
+        return restaurantRepository.create(restaurant);
     }
 }
