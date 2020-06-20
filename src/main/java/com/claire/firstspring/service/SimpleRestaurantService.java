@@ -29,7 +29,7 @@ public class SimpleRestaurantService implements RestaurantService {
     }
 
     @Override
-    public Restaurant addRestaurant(Restaurant restaurant) {
+    public Restaurant create(Restaurant restaurant) {
         return restaurantRepository.create(restaurant);
     }
 }

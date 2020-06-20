@@ -22,7 +22,7 @@ public class PersistenceConfig {
     @Value("${database.password}")
     private String databasePassword;
 
-    @Value("${spring.flyway.default-schema:menu_db}")
+    @Value("${spring.flyway.default-schema}")
     private String schema;
 
     @Bean
@@ -37,7 +37,7 @@ public class PersistenceConfig {
     }
 
     @Bean
-    public String schema() {
+    public String schemaName() {
         return '\"' + schema + '\"';
     }
 

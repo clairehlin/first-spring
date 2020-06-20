@@ -18,15 +18,15 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final RestaurantRowMapper restaurantRowMapper;
-    private final String schema;
+    private final String schemaName;
     private final IdGeneratingRepository idGeneratingRepository;
     private final MenuRepository menuRepository;
 
 
-    public SimpleRestaurantRepository(JdbcTemplate jdbcTemplate, RestaurantRowMapper restaurantRowMapper, String schema, IdGeneratingRepository idGeneratingRepository, MenuRepository menuRepository) {
+    public SimpleRestaurantRepository(JdbcTemplate jdbcTemplate, RestaurantRowMapper restaurantRowMapper, String schemaName, IdGeneratingRepository idGeneratingRepository, MenuRepository menuRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.restaurantRowMapper = restaurantRowMapper;
-        this.schema = schema;
+        this.schemaName = schemaName;
         this.idGeneratingRepository = idGeneratingRepository;
         this.menuRepository = menuRepository;
     }
@@ -34,12 +34,12 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
     @Override
     public List<Restaurant> restaurants() {
         final List<Restaurant> restaurants = jdbcTemplate.query(
-            String.format("SELECT * FROM %s.restaurant LIMIT 101", schema),
+            String.format("SELECT * FROM %s.restaurant LIMIT 101", schemaName),
             restaurantRowMapper
         );
         if (restaurants.size() > 100) {
             final Integer restaurantCount = jdbcTemplate.queryForObject(
-                String.format("SELECT COUNT(*) FROM %s.restaurant", schema),
+                String.format("SELECT COUNT(*) FROM %s.restaurant", schemaName),
                 Integer.class
             );
             throw new RuntimeException("too many rows of restaurants in database: " + restaurantCount);
@@ -50,7 +50,7 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
     @Override
     public Optional<Restaurant> restaurant(Integer id) {
         List<Restaurant> listOfRestaurant = jdbcTemplate.query(
-            String.format("SELECT * FROM %s.restaurant LIMIT 101", schema),
+            String.format("SELECT * FROM %s.restaurant LIMIT 101", schemaName),
             restaurantRowMapper
         );
         if (listOfRestaurant.size() > 100) {
@@ -68,7 +68,7 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
         String name = restaurant.name();
 
         jdbcTemplate.update(
-            String.format("INSERT INTO %s.restaurant (id, name) VALUES (?, ?)", schema),
+            String.format("INSERT INTO %s.restaurant (id, name) VALUES (?, ?)", schemaName),
             restaurantId,
             name
         );
@@ -93,7 +93,7 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
 
     public Optional<Restaurant> restaurant2(Integer id) {
         Restaurant restaurant = jdbcTemplate.queryForObject(
-            String.format("SELECT * FROM %s.restaurant WHERE id = ?", schema),
+            String.format("SELECT * FROM %s.restaurant WHERE id = ?", schemaName),
             toArray(id),
             restaurantRowMapper
         );
@@ -102,7 +102,7 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
 
     @Override
     public String getMainTableName() {
-        return String.format("%s.restaurant", schema);
+        return String.format("%s.restaurant", schemaName);
     }
 
     /*

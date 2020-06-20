@@ -1,0 +1,5 @@
+curl --verbose \
+    -X POST \
+    -H 'Content-Type: application/json' \
+    --data '{ "name":"restaurant a" }' \
+    http://localhost:8080/restaurants

@@ -1,10 +1,11 @@
 package com.claire.firstspring.repository;
 
 import com.claire.firstspring.config.PersistenceConfig;
+import com.claire.firstspring.model.Menu;
 import com.claire.firstspring.model.Restaurant;
+import com.claire.firstspring.model.SimpleRestaurant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +16,12 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 
 import javax.sql.DataSource;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(
     properties = "spring.main.allow-bean-definition-overriding=true"
 )
+@Sql({"classpath:db/V1__db_init.sql", "classpath:test-data.sql"})
 class SimpleRestaurantRepositoryTest {
 
     @Autowired
@@ -53,6 +58,24 @@ class SimpleRestaurantRepositoryTest {
             .isNotEmpty();
     }
 
+    @Test
+    void can_create_a_restaurant() {
+        //given
+        Set<Menu> menus = new HashSet<>();
+        SimpleRestaurant simpleRestaurant = new SimpleRestaurant(3, "Maui Cafe", menus);
+
+        //when
+        simpleRestaurantRepository.create(simpleRestaurant);
+
+        //then
+        final List<Restaurant> restaurants = simpleRestaurantRepository.restaurants();
+        assertThat(restaurants)
+            .hasSize(3)
+            .extracting(Restaurant::name)
+            .containsExactlyInAnyOrder("Ruth Steakhouse", "Sam Steakhouse", "Maui Cafe");
+
+    }
+
     @Configuration
     @Import({
         PersistenceConfig.class,
@@ -75,14 +98,12 @@ class SimpleRestaurantRepositoryTest {
             return new EmbeddedDatabaseBuilder()
                 .generateUniqueName(true)
                 .setType(EmbeddedDatabaseType.H2)
-                .addScript("classpath:db/V1__schema.sql")
-                .addScript("classpath:test-data.sql")
                 .build();
         }
 
         @Bean
         @Primary
-        public String schema() {
+        public String schemaName() {
             return "\"PUBLIC\"";
         }
     }

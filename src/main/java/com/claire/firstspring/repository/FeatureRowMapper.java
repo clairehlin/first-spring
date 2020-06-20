@@ -11,6 +11,6 @@ import java.sql.SQLException;
 public class FeatureRowMapper implements RowMapper<Feature> {
     @Override
     public Feature mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return Feature.valueOf(rs.getString("name"));
+        return new Feature(rs.getString("name"));
     }
 }

@@ -2,7 +2,9 @@ package com.claire.firstspring.web;
 
 import com.claire.firstspring.model.Menu;
 import com.claire.firstspring.model.Restaurant;
+import com.claire.firstspring.service.MenuService;
 import com.claire.firstspring.service.RestaurantService;
+import com.claire.firstspring.service.SimpleMenuService;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -21,9 +23,10 @@ class RestaurantResourceTest {
             new TestRestaurant()
         );
         RestaurantService restaurantService = new TestRestaurantService(expectedRestaurants);
+        MenuService menuService = new TestMenuService();
 
         //when
-        RestaurantResource restaurantResource = new RestaurantResource(restaurantService);
+        RestaurantResource restaurantResource = new RestaurantResource(restaurantService, menuService);
         final List<Restaurant> restaurants = restaurantResource.restaurants();
 
         //then
@@ -68,8 +71,21 @@ class RestaurantResourceTest {
         }
 
         @Override
-        public Restaurant addRestaurant(Restaurant restaurant) {
+        public Restaurant create(Restaurant restaurant) {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    private static class TestMenuService implements MenuService {
+
+        @Override
+        public Menu addMenu(Integer restaurantId, Menu menu) {
+            return null;
+        }
+
+        @Override
+        public List<Menu> list() {
+            return null;
         }
     }
 }

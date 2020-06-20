@@ -1,9 +1,18 @@
 package com.claire.firstspring.model;
 
-public enum Feature {
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-    Vegetarian,
-    Keto,
-    GlutenFree,
-    Spicy
+public class Feature {
+
+    private final String name;
+
+    public Feature(String name) {
+        checkArgument(isNotBlank(name), "feature name cannot be blank but was [%s]", name);
+        this.name = name;
+    }
+
+    public String name() {
+        return name;
+    }
 }

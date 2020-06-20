@@ -73,7 +73,7 @@ class SimpleRestaurantServiceTest {
             return new EmbeddedDatabaseBuilder()
                 .generateUniqueName(true)
                 .setType(EmbeddedDatabaseType.H2)
-                .addScript("classpath:db/V1__schema.sql")
+                .addScript("classpath:db/V1__db_init.sql")
                 .addScript("classpath:test-data.sql")
                 .build();
         }

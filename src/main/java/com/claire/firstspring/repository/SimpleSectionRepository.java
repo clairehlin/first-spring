@@ -17,15 +17,15 @@ public class SimpleSectionRepository implements SectionRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final SectionRowMapper sectionRowMapper;
-    private final String schema;
+    private final String schemaName;
     private final IdGeneratingRepository idGeneratingRepository;
     private final ItemRepository itemRepository;
 
 
-    public SimpleSectionRepository(JdbcTemplate jdbcTemplate, SectionRowMapper sectionRowMapper, String schema, IdGeneratingRepository idGeneratingRepository, ItemRepository itemRepository) {
+    public SimpleSectionRepository(JdbcTemplate jdbcTemplate, SectionRowMapper sectionRowMapper, String schemaName, IdGeneratingRepository idGeneratingRepository, ItemRepository itemRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.sectionRowMapper = sectionRowMapper;
-        this.schema = schema;
+        this.schemaName = schemaName;
         this.idGeneratingRepository = idGeneratingRepository;
         this.itemRepository = itemRepository;
     }
@@ -33,7 +33,7 @@ public class SimpleSectionRepository implements SectionRepository {
     @Override
     public List<Section> sections() {
         return jdbcTemplate.query(
-            String.format("SELECT * FROM %s.sections LIMIT 101", schema),
+            String.format("SELECT * FROM %s.sections LIMIT 101", schemaName),
             sectionRowMapper
         );
     }
@@ -41,7 +41,7 @@ public class SimpleSectionRepository implements SectionRepository {
     @Override
     public Optional<Section> section(Integer id) {
         Section section = jdbcTemplate.queryForObject(
-            String.format("SELECT * FROM %s.section WHERE id = ?", schema),
+            String.format("SELECT * FROM %s.section WHERE id = ?", schemaName),
             toArray(id),
             sectionRowMapper
         );
@@ -51,7 +51,7 @@ public class SimpleSectionRepository implements SectionRepository {
     @Override
     public List<Section> menuSections(Integer menuId) {
         return jdbcTemplate.query(
-            String.format("SELECT * FROM %s.section WHERE menu_id = ?", schema),
+            String.format("SELECT * FROM %s.section WHERE menu_id = ?", schemaName),
             toArray(menuId),
             sectionRowMapper
         );
@@ -64,7 +64,7 @@ public class SimpleSectionRepository implements SectionRepository {
         String name = section.name();
 
         jdbcTemplate.update(
-            String.format("INSERT INTO %s.section (id, name, menu_id) VALUES (?, ?, ?)", schema),
+            String.format("INSERT INTO %s.section (id, name, menu_id) VALUES (?, ?, ?)", schemaName),
             sectionId,
             name,
             menuId
@@ -89,6 +89,6 @@ public class SimpleSectionRepository implements SectionRepository {
 
     @Override
     public String getMainTableName() {
-        return String.format("%s.section", schema);
+        return String.format("%s.section", schemaName);
     }
 }

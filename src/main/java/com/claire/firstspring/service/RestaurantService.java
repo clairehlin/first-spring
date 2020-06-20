@@ -9,5 +9,5 @@ public interface RestaurantService {
 
     Restaurant get(Integer id);
 
-    Restaurant addRestaurant(Restaurant restaurant);
+    Restaurant create(Restaurant restaurant);
 }

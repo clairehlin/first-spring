@@ -13,28 +13,32 @@ public class SimpleFeatureRepository implements FeatureRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final FeatureRowMapper featureRowMapper;
-    private final String schema;
+    private final String schemaName;
+    private final IdGeneratingRepository idGeneratingRepository;
 
-    public SimpleFeatureRepository(JdbcTemplate jdbcTemplate, FeatureRowMapper featureRowMapper, String schema) {
+    public SimpleFeatureRepository(JdbcTemplate jdbcTemplate, FeatureRowMapper featureRowMapper, String schemaName, IdGeneratingRepository idGeneratingRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.featureRowMapper = featureRowMapper;
-        this.schema = schema;
+        this.schemaName = schemaName;
+        this.idGeneratingRepository = idGeneratingRepository;
     }
 
     @Override
     public Set<Feature> itemFeatures(Integer itemId) {
         return Set.copyOf(
             jdbcTemplate.query(
-                String.format("SELECT %s.feature.name AS name " +
+                String.format(
+                    "SELECT %s.feature.name AS name " +
                     "FROM %s.feature INNER JOIN %s.item_feature " +
                     "ON %s.feature.id = %s.item_feature.feature_id " +
                     "WHERE %s.item_feature.item_id = ?",
-                    schema,
-                    schema,
-                    schema,
-                    schema,
-                    schema,
-                    schema),
+                    schemaName,
+                    schemaName,
+                    schemaName,
+                    schemaName,
+                    schemaName,
+                    schemaName
+                ),
                 toArray(itemId),
                 featureRowMapper
             )
@@ -44,9 +48,34 @@ public class SimpleFeatureRepository implements FeatureRepository {
     @Override
     public Integer id(Feature feature) {
         return jdbcTemplate.queryForObject(
-            String.format("SELECT id FROM %s.feature WHERE name = ?", schema),
+            String.format("SELECT id FROM %s.feature WHERE name = ?", schemaName),
             toArray(feature.name()),
             Integer.class
         );
+    }
+
+    @Override
+    public Set<Feature> list() {
+        return Set.copyOf(
+            jdbcTemplate.query(
+                String.format("SELECT name FROM %s.feature", schemaName),
+                featureRowMapper
+            )
+        );
+    }
+
+    @Override
+    public void create(Feature feature) {
+        int id = idGeneratingRepository.nextId(this);
+        jdbcTemplate.update(
+            String.format("INSERT INTO %s.feature (id, name) VALUES (?, ?)", schemaName),
+            id,
+            feature.name()
+        );
+    }
+
+    @Override
+    public String getMainTableName() {
+        return String.format("%s.feature", schemaName);
     }
 }

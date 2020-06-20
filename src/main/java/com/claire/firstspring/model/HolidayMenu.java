@@ -3,10 +3,6 @@ package com.claire.firstspring.model;
 import java.util.List;
 import java.util.Set;
 
-import static com.claire.firstspring.model.Feature.GlutenFree;
-import static com.claire.firstspring.model.Feature.Keto;
-import static com.claire.firstspring.model.Feature.Spicy;
-import static com.claire.firstspring.model.Feature.Vegetarian;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections4.SetUtils.emptySet;
 import static org.apache.commons.collections4.SetUtils.hashSet;
@@ -14,9 +10,15 @@ import static org.apache.commons.collections4.SetUtils.hashSet;
 public class HolidayMenu implements Menu {
 
     private Integer id;
+    private final Feature keto = new Feature("Keto");
+    private final Feature glutenFree = new Feature("GlutenFree");
+    private final Feature vegetarian = new Feature("Vegetarian");
+    private final Feature spicy = new Feature("Spicy");
     private final Section appetizers = new SimpleSection(id, "Appetizers", appetizerItems());
     private final Section sandwiches = new SimpleSection(id, "Sandwiches", sandwichItems());
     private final Section salads = new SimpleSection(id, "Salads", saladItems());
+
+
 
     @Override
     public Integer id() {
@@ -40,13 +42,13 @@ public class HolidayMenu implements Menu {
             id, "Silver Star Cobb",
             "avocado bacon blue cheese",
             14.0,
-            hashSet(GlutenFree, Keto)
+            hashSet(glutenFree, keto)
         );
         final SimpleItem strawberryPecan = new SimpleItem(
             id, "Strawberry Pecan",
             "spring mixed greens with freshly sliced strawberries and candied pecans",
             13.0,
-            hashSet(Vegetarian)
+            hashSet(vegetarian)
         );
         return asList(silverStarCobb, strawberryPecan);
     }
@@ -62,7 +64,7 @@ public class HolidayMenu implements Menu {
             id, "Smoked Turkey",
             "turkey breast with bistro sauce",
             10.0,
-            hashSet(Spicy)
+            hashSet(spicy)
         );
         return asList(cheeseBurger, smokedTurkey);
     }
@@ -72,7 +74,7 @@ public class HolidayMenu implements Menu {
             id, "Warm Mozzarella",
             "creamy cheese baked and topped with reduction",
             15.0,
-            hashSet(GlutenFree, Spicy)
+            hashSet(glutenFree, spicy)
         );
         final SimpleItem jumboCrabClaws = new SimpleItem(
             id, "Jumbo Crab Claws",

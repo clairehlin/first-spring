@@ -16,14 +16,14 @@ public class SimpleItemRepository implements ItemRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final ItemRowMapper itemRowMapper;
-    private final String schema;
+    private final String schemaName;
     private final IdGeneratingRepository idGeneratingRepository;
     private final FeatureRepository featureRepository;
 
-    public SimpleItemRepository(JdbcTemplate jdbcTemplate, ItemRowMapper itemRowMapper, String schema, IdGeneratingRepository idGeneratingRepository, FeatureRepository featureRepository) {
+    public SimpleItemRepository(JdbcTemplate jdbcTemplate, ItemRowMapper itemRowMapper, String schemaName, IdGeneratingRepository idGeneratingRepository, FeatureRepository featureRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.itemRowMapper = itemRowMapper;
-        this.schema = schema;
+        this.schemaName = schemaName;
         this.idGeneratingRepository = idGeneratingRepository;
         this.featureRepository = featureRepository;
     }
@@ -31,7 +31,7 @@ public class SimpleItemRepository implements ItemRepository {
     @Override
     public List<Item> sectionItems(Integer sectionId) {
         return jdbcTemplate.query(
-            String.format("SELECT * FROM %s.item WHERE section_id = ?", schema),
+            String.format("SELECT * FROM %s.item WHERE section_id = ?", schemaName),
             toArray(sectionId),
             itemRowMapper
         );
@@ -45,7 +45,7 @@ public class SimpleItemRepository implements ItemRepository {
         double price = item.price();
 
         jdbcTemplate.update(
-            String.format("INSERT INTO %s.item (id, name, description, price, section_id) VALUES (?, ?, ?, ?, ?)", schema),
+            String.format("INSERT INTO %s.item (id, name, description, price, section_id) VALUES (?, ?, ?, ?, ?)", schemaName),
             itemId,
             name,
             description,
@@ -72,7 +72,7 @@ public class SimpleItemRepository implements ItemRepository {
 
     private void insertRowFor(Integer itemId, Integer featureId) {
         jdbcTemplate.update(
-            String.format("INSERT INTO %s.item_feature (item_id, feature_id) VALUES (?, ?)", schema),
+            String.format("INSERT INTO %s.item_feature (item_id, feature_id) VALUES (?, ?)", schemaName),
             itemId,
             featureId
         );
@@ -80,6 +80,6 @@ public class SimpleItemRepository implements ItemRepository {
 
     @Override
     public String getMainTableName() {
-        return String.format("%s.item", schema);
+        return String.format("%s.item", schemaName);
     }
 }

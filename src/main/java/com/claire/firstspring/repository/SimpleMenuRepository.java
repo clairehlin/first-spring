@@ -19,26 +19,26 @@ public class SimpleMenuRepository implements MenuRepository {
     private final JdbcTemplate jdbcTemplate;
     private final MenuRowMapper menuRowMapper;
     private final IdGeneratingRepository idGeneratingRepository;
-    private final String schema;
+    private final String schemaName;
     private final SectionRepository sectionRepository;
 
-    public SimpleMenuRepository(JdbcTemplate jdbcTemplate, MenuRowMapper menuRowMapper, IdGeneratingRepository idGeneratingRepository, String schema, SectionRepository sectionRepository) {
+    public SimpleMenuRepository(JdbcTemplate jdbcTemplate, MenuRowMapper menuRowMapper, IdGeneratingRepository idGeneratingRepository, String schemaName, SectionRepository sectionRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.menuRowMapper = menuRowMapper;
         this.idGeneratingRepository = idGeneratingRepository;
-        this.schema = schema;
+        this.schemaName = schemaName;
         this.sectionRepository = sectionRepository;
     }
 
     @Override
     public List<Menu> menus() {
         final List<Menu> menus = jdbcTemplate.query(
-            String.format("SELECT * FROM %s.menu LIMIT 101", schema),
+            String.format("SELECT * FROM %s.menu LIMIT 101", schemaName),
             menuRowMapper
         );
         if (menus.size() > 100) {
             final Integer menusCount = jdbcTemplate.queryForObject(
-                String.format("SELECT COUNT(*) FROM %s.menu", schema),
+                String.format("SELECT COUNT(*) FROM %s.menu", schemaName),
                 Integer.class
             );
             throw new RuntimeException("too many rows of menus in database: " + menusCount);
@@ -49,7 +49,7 @@ public class SimpleMenuRepository implements MenuRepository {
     @Override
     public Optional<Menu> menu(Integer menuId) {
         Menu menu = jdbcTemplate.queryForObject(
-            String.format("SELECT * FROM %s.menu WHERE id = ?", schema),
+            String.format("SELECT * FROM %s.menu WHERE id = ?", schemaName),
             toArray(menuId),
             menuRowMapper
         );
@@ -59,7 +59,7 @@ public class SimpleMenuRepository implements MenuRepository {
     @Override
     public List<Menu> restaurantMenus(Integer restaurantId) {
         return jdbcTemplate.query(
-            String.format("SELECT * FROM %s.menu WHERE restaurant_id = ?", schema),
+            String.format("SELECT * FROM %s.menu WHERE restaurant_id = ?", schemaName),
             toArray(restaurantId),
             menuRowMapper
         );
@@ -71,7 +71,7 @@ public class SimpleMenuRepository implements MenuRepository {
         String name = menu.name();
 
         jdbcTemplate.update(
-            String.format("INSERT INTO %s.menu (id, name, restaurant_id) VALUES (?, ?, ?)", schema),
+            String.format("INSERT INTO %s.menu (id, name, restaurant_id) VALUES (?, ?, ?)", schemaName),
             menuId,
             name,
             restaurantId
@@ -96,6 +96,6 @@ public class SimpleMenuRepository implements MenuRepository {
 
     @Override
     public String getMainTableName() {
-        return String.format("%s.menu", schema);
+        return String.format("%s.menu", schemaName);
     }
 }
