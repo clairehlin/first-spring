@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static org.apache.commons.lang3.ArrayUtils.toArray;
@@ -52,7 +53,7 @@ public class SimpleItemRepository implements ItemRepository {
             price,
             sectionId
         );
-        associatedFeatures(itemId, item.features());
+        associateFeatures(itemId, item.features());
 
         return new SimpleItem(
             itemId,
@@ -63,11 +64,71 @@ public class SimpleItemRepository implements ItemRepository {
         );
     }
 
-    private void associatedFeatures(Integer itemId, Set<Feature> features) {
+    @Override
+    public List<Item> list() {
+        return jdbcTemplate.query(
+            String.format("SELECT * FROM %s.item", schemaName),
+            itemRowMapper
+        );
+    }
+
+    @Override
+    public Item getItem(Integer itemId) {
+        return jdbcTemplate.queryForObject(
+            String.format("SELECT * FROM %s.item WHERE id = ?", schemaName),
+            itemRowMapper,
+            itemId
+        );
+    }
+
+    @Override
+    public void deleteItem(Integer itemId) {
+        final int updated = jdbcTemplate.update(
+            String.format("DELETE FROM %s.item WHERE id = ?", schemaName),
+            itemId
+        );
+        if (updated < 1) {
+            throw new NoSuchElementException("could not delete an item with id " + itemId + ", perhaps it does not exist");
+        }
+    }
+
+    @Override
+    public void updateItemIgnoringFeatures(Item item) {
+        final int updated = jdbcTemplate.update(
+            String.format("UPDATE %s.item SET name = ?, description = ?, price = ? WHERE id =?", schemaName),
+            item.name(),
+            item.description(),
+            item.price(),
+            item.id()
+        );
+
+        if (updated < 1) {
+            throw new NoSuchElementException("could not update and item with id " + item.id() + ", perhaps it does not exist");
+        }
+    }
+
+    @Override
+    public void associateFeatures(Integer itemId, Set<Feature> features) {
         for (Feature feature : features) {
             final Integer featureId = featureRepository.id(feature);
             insertRowFor(itemId, featureId);
         }
+    }
+
+    @Override
+    public void disassociateFeatures(Integer itemId, Set<Feature> features) {
+        for (Feature feature : features) {
+            final Integer featureId = featureRepository.id(feature);
+            removeRowFor(itemId, featureId);
+        }
+    }
+
+    private void removeRowFor(Integer itemId, Integer featureId) {
+        jdbcTemplate.update(
+            String.format("DELETE FROM %s.item_feature WHERE item_id = ? AND feature_id = ?", schemaName),
+            itemId,
+            featureId
+        );
     }
 
     private void insertRowFor(Integer itemId, Integer featureId) {
@@ -77,6 +138,7 @@ public class SimpleItemRepository implements ItemRepository {
             featureId
         );
     }
+
 
     @Override
     public String getMainTableName() {
