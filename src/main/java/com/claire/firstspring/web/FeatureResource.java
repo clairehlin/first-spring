@@ -1,16 +1,34 @@
 package com.claire.firstspring.web;
 
 import com.claire.firstspring.mappers.FeatureMapper;
+import com.claire.firstspring.model.Feature;
 import com.claire.firstspring.service.FeatureService;
+import com.claire.firstspring.web.model.FeatureUpdate;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
+
+/**
+ * get all - done
+ * get one - done
+ * update multiple - done
+ * update one - done
+ * delete one - done
+ * delete multiple - done
+ * create one feature
+ * create multiple feature
+ */
 
 @RestController
 @RequestMapping("/features")
@@ -32,8 +50,24 @@ public class FeatureResource {
             .collect(toSet());
     }
 
-    @PostMapping("/{name}")
-    public void create(@PathVariable String name) {
-        featureService.create(featureMapper.toFirst(name));
+    @PutMapping("/{current-name}/name/{new-name}")
+    public void updateFeature(@PathVariable("current-name") String currentName, @PathVariable("new-name") String newName) {
+        featureService.updateFeature(currentName, newName);
+    }
+
+    @PutMapping
+    public void updateFeatures(@RequestBody List<FeatureUpdate> featureUpdates) {
+        featureUpdates.forEach(featureUpdate -> this.updateFeature(featureUpdate.currentName, featureUpdate.newName));
+    }
+
+    @PutMapping("/{feature-name}")
+    public void createFeature(@PathVariable("feature-name") String featureName) {
+        Feature feature = new Feature(featureName);
+        featureService.create(feature);
+    }
+
+    @DeleteMapping("/{feature-name}")
+    public void deleteFeature(@PathVariable("feature-name") String featureName) {
+        featureService.delete(featureName);
     }
 }

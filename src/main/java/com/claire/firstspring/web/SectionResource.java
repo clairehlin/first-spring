@@ -1,27 +1,42 @@
 package com.claire.firstspring.web;
 
 import com.claire.firstspring.mappers.FeatureMapper;
+import com.claire.firstspring.mappers.ItemMapper;
 import com.claire.firstspring.mappers.SectionMapper;
-import com.claire.firstspring.model.Feature;
 import com.claire.firstspring.model.Item;
+import com.claire.firstspring.model.Section;
 import com.claire.firstspring.model.SimpleItem;
+import com.claire.firstspring.model.SimpleSection;
 import com.claire.firstspring.service.ItemService;
 import com.claire.firstspring.service.SectionService;
 import com.claire.firstspring.web.model.WebItem;
 import com.claire.firstspring.web.model.WebSection;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Set;
+import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
+/**
+ * get all - done
+ * get one - done
+ * update one - done
+ * update multiple - done
+ * delete one - done
+ * create one - done
+ * create multiple secions - done
+ * create multiple items - done
+ * create one item - done
+ */
 @RestController
 @RequestMapping("/sections")
 public class SectionResource {
@@ -30,17 +45,19 @@ public class SectionResource {
     private final ItemService itemService;
     private final SectionMapper sectionMapper;
     private final FeatureMapper featureMapper;
+    private final ItemMapper itemMapper;
 
     public SectionResource(
         SectionService sectionService,
         ItemService itemService,
         SectionMapper sectionMapper,
-        FeatureMapper featureMapper
-    ) {
+        FeatureMapper featureMapper,
+        ItemMapper itemMapper) {
         this.sectionService = sectionService;
         this.itemService = itemService;
         this.sectionMapper = sectionMapper;
         this.featureMapper = featureMapper;
+        this.itemMapper = itemMapper;
     }
 
     @GetMapping
@@ -51,21 +68,58 @@ public class SectionResource {
             .collect(toList());
     }
 
-    @PostMapping("/{section-id}/items")
-    public void createItems(@PathVariable("section-id") Integer sectionId, @RequestBody WebItem webItem) {
-        Item item = new SimpleItem(
-            sectionId,
-            webItem.name,
-            webItem.description,
-            webItem.price,
-            toFeatures(webItem.features)
-        );
-        itemService.addItem(sectionId, item);
+    @GetMapping("/{section-id}")
+    public WebSection section(@PathVariable("section-id") Integer sectionId) {
+        return sectionMapper.toSecond(sectionService.getSection(sectionId));
     }
 
-    private Set<Feature> toFeatures(Set<String> features) {
-        return features.stream()
-            .map(featureMapper::toFirst)
-            .collect(toSet());
+    @PutMapping("/{section-id}")
+    public void updateSection(@PathVariable("section-id") Integer sectionId, @RequestBody WebSection webSection) {
+        Section section = new SimpleSection(
+            sectionId,
+            webSection.name,
+            itemMapper.toFirsts(webSection.items)
+        );
+        sectionService.updateSection(section);
+    }
+
+    @PutMapping
+    public void updateSections(@RequestBody List<WebSection> webSections) {
+        webSections.forEach(
+            webSection -> this.updateSection(webSection.id, webSection)
+        );
+    }
+
+    @PostMapping("/{section-id}/items")
+    public void createItems(@PathVariable("section-id") Integer sectionId, @RequestBody List<WebItem> webItems) {
+        webItems.forEach(createItem(sectionId));
+    }
+
+    @PostMapping("/{section-id}/item")
+    public void createItem(@PathVariable("section-id") Integer sectionId, @RequestBody WebItem webItem) {
+        createItem(sectionId);
+    }
+
+    @DeleteMapping("/{section-id}")
+    public void deleteSection(@PathVariable("section-id") Integer sectionId) {
+        sectionService.deleteSection(sectionId);
+    }
+
+    @DeleteMapping
+    public void deleteSections(@RequestParam("ids") List<Integer> sectionIds) {
+        sectionIds.forEach(sectionService::deleteSection);
+    }
+
+    private Consumer<WebItem> createItem(Integer sectionId) {
+        return webItem -> {
+            Item item = new SimpleItem(
+                sectionId,
+                webItem.name,
+                webItem.description,
+                webItem.price,
+                featureMapper.toFirsts(webItem.features)
+            );
+            itemService.addNewItemToSection(sectionId, item);
+        };
     }
 }

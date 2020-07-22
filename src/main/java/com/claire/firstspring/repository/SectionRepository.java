@@ -12,7 +12,11 @@ public interface SectionRepository extends MainTableAwareRepository {
 
     Optional<Section> section(Integer id);
 
-    List<Section> menuSections(Integer id);
+    List<Section> menuSections(Integer menuId);
 
     Section create(Integer menuId, Section section);
+
+    void deleteSection(Integer sectionId);
+
+    void updateSectionName(Integer id, String name);
 }

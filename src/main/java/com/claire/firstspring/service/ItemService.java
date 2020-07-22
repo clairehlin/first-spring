@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ItemService {
 
-    Item addItem(Integer sectionId, Item item);
+    Item addNewItemToSection(Integer sectionId, Item item);
 
     List<Item> list();
 

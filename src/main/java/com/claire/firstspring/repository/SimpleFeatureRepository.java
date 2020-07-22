@@ -74,6 +74,18 @@ public class SimpleFeatureRepository implements FeatureRepository {
         );
     }
 
+    //TODO
+    @Override
+    public void delete(String featureName) {
+
+    }
+
+    //TODO
+    @Override
+    public void update(String currentName, String newName) {
+
+    }
+
     @Override
     public String getMainTableName() {
         return String.format("%s.feature", schemaName);

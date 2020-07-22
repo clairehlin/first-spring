@@ -13,14 +13,26 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
+/**
+ * get all - done
+ * get one - done
+ * update multiple - done
+ * update one - done
+ * delete one - done
+ * delete multiple - done
+ * create one item- exists in section resource
+ * create multiple items - exists in section resource
+ */
 @RestController
 @RequestMapping("/items")
 public class ItemResource {
@@ -57,6 +69,11 @@ public class ItemResource {
         itemService.deleteItem(itemId);
     }
 
+    @DeleteMapping
+    public void deleteItems(@RequestParam("ids") List<Integer> itemIds) {
+        itemIds.forEach(itemService::deleteItem);
+    }
+
     @PutMapping("/{item-id}")
     public void updateItem(@PathVariable("item-id") Integer itemId, @RequestBody WebItem webItem) {
         Item item = new SimpleItem(
@@ -64,7 +81,7 @@ public class ItemResource {
             webItem.name,
             webItem.description,
             webItem.price,
-            toFeatures(webItem.features)
+            featureMapper.toFirsts(webItem.features)
         );
         itemService.updateItem(item);
     }
@@ -75,11 +92,4 @@ public class ItemResource {
             webItem -> this.updateItem(webItem.id, webItem)
         );
     }
-
-    private Set<Feature> toFeatures(Set<String> features) {
-        return features.stream()
-            .map(featureMapper::toFirst)
-            .collect(toSet());
-    }
-
 }

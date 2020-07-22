@@ -2,7 +2,6 @@ package com.claire.firstspring.service;
 
 import com.claire.firstspring.config.PersistenceConfig;
 import com.claire.firstspring.repository.FeatureRowMapper;
-import com.claire.firstspring.repository.IdGeneratingRepository;
 import com.claire.firstspring.repository.ItemRowMapper;
 import com.claire.firstspring.repository.MenuRowMapper;
 import com.claire.firstspring.repository.RestaurantRowMapper;
@@ -43,10 +42,11 @@ class SimpleRestaurantServiceTest {
 
     @Autowired
     SimpleRestaurantRepository simpleRestaurantRepository;
+    SimpleMenuRepository simpleMenuRepository;
 
     @Test
     void can_get_a_list_of_restaurants() {
-        SimpleRestaurantService simpleRestaurantService = new SimpleRestaurantService(simpleRestaurantRepository);
+        SimpleRestaurantService simpleRestaurantService = new SimpleRestaurantService(simpleRestaurantRepository, simpleMenuRepository);
         assertThat(simpleRestaurantService.list())
             .hasSize(2);
     }

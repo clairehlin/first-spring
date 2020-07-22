@@ -13,4 +13,8 @@ public interface MenuRepository extends MainTableAwareRepository {
     List<Menu> restaurantMenus(Integer restaurantId);
 
     Menu create(Integer restaurantId, Menu menu);
+
+    void delete(Integer menuId);
+
+    void updateMenuName(Integer id, String name);
 }

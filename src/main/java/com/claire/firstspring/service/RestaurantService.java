@@ -10,4 +10,8 @@ public interface RestaurantService {
     Restaurant get(Integer id);
 
     Restaurant create(Restaurant restaurant);
+
+    void updateRestaurant(Restaurant restaurant);
+
+    void deleteRestaurant(Integer restaurantId);
 }

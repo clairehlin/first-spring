@@ -77,6 +77,18 @@ public class SimpleSectionRepository implements SectionRepository {
         );
     }
 
+    //TODO
+    @Override
+    public void deleteSection(Integer sectionId) {
+
+    }
+
+    //TODO
+    @Override
+    public void updateSectionName(Integer id, String name) {
+
+    }
+
     private List<Item> createdItems(int sectionId, List<Item> items) {
         List<Item> createdItems = new ArrayList<>();
 

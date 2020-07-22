@@ -80,6 +80,12 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
         );
     }
 
+    //TODO
+    @Override
+    public void delete(Integer restaurantId) {
+
+    }
+
     private Set<Menu> createdMenus(int restaurantId, Set<Menu> menus) {
         Set<Menu> createdMenus = new HashSet<>();
 

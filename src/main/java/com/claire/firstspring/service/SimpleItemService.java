@@ -23,7 +23,7 @@ public class SimpleItemService implements ItemService {
     }
 
     @Override
-    public Item addItem(Integer sectionId, Item item) {
+    public Item addNewItemToSection(Integer sectionId, Item item) {
         return itemRepository.create(sectionId, item);
     }
 

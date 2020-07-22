@@ -12,4 +12,8 @@ public interface FeatureRepository extends MainTableAwareRepository {
     Set<Feature> list();
 
     void create(Feature name);
+
+    void delete(String featureName);
+
+    void update(String currentName, String newName);
 }

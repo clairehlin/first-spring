@@ -1,10 +1,11 @@
 package com.claire.firstspring.web;
 
+import com.claire.firstspring.mappers.MenuMapper;
+import com.claire.firstspring.mappers.SectionMapper;
 import com.claire.firstspring.model.Menu;
 import com.claire.firstspring.model.Restaurant;
 import com.claire.firstspring.service.MenuService;
 import com.claire.firstspring.service.RestaurantService;
-import com.claire.firstspring.service.SimpleMenuService;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -24,9 +25,12 @@ class RestaurantResourceTest {
         );
         RestaurantService restaurantService = new TestRestaurantService(expectedRestaurants);
         MenuService menuService = new TestMenuService();
+        MenuMapper menuMapper = new MenuMapper();
+        SectionMapper sectionMapper = new SectionMapper();
 
         //when
-        RestaurantResource restaurantResource = new RestaurantResource(restaurantService, menuService);
+
+        RestaurantResource restaurantResource = new RestaurantResource(restaurantService, menuService, sectionMapper, menuMapper);
         final List<Restaurant> restaurants = restaurantResource.restaurants();
 
         //then
@@ -74,6 +78,16 @@ class RestaurantResourceTest {
         public Restaurant create(Restaurant restaurant) {
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        public void updateRestaurant(Restaurant restaurant) {
+
+        }
+
+        @Override
+        public void deleteRestaurant(Integer restaurantId) {
+
+        }
     }
 
     private static class TestMenuService implements MenuService {
@@ -86,6 +100,21 @@ class RestaurantResourceTest {
         @Override
         public List<Menu> list() {
             return null;
+        }
+
+        @Override
+        public Menu menu(Integer menuId) {
+            return null;
+        }
+
+        @Override
+        public void updateMenu(Menu menu) {
+
+        }
+
+        @Override
+        public void deleteMenu(Integer menuId) {
+
         }
     }
 }

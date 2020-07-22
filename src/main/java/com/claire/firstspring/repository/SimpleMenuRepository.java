@@ -84,6 +84,18 @@ public class SimpleMenuRepository implements MenuRepository {
         );
     }
 
+    //TODO
+    @Override
+    public void delete(Integer menuId) {
+
+    }
+
+    //TODO
+    @Override
+    public void updateMenuName(Integer id, String name) {
+
+    }
+
     private Set<Section> createdSections(int menuId, Set<Section> sections) {
         Set<Section> createdSections = new HashSet<>();
 
