@@ -2,6 +2,7 @@ package com.claire.firstspring.service;
 
 import com.claire.firstspring.model.Item;
 import com.claire.firstspring.model.Section;
+import com.claire.firstspring.model.SimpleSection;
 import com.claire.firstspring.repository.ItemRepository;
 import com.claire.firstspring.repository.SectionRepository;
 import org.apache.commons.lang3.Validate;
@@ -28,7 +29,18 @@ public class SimpleSectionService implements SectionService {
 
     @Override
     public Section addSection(Integer menuId, Section section) {
-        return sectionRepository.create(menuId, section);
+        Validate.notNull(menuId, "menu id cannot be null.");
+        Validate.notNull(section, "section cannot be null");
+        Validate.isTrue(section.id() == null, "section id must be null for a new section.");
+
+        final Section createdSection = sectionRepository.create(menuId, section.name());
+
+        final List<Item> newItems = section.items()
+            .stream()
+            .map(item -> itemService.addNewItemToSection(createdSection.id(), item))
+            .collect(toList());
+
+        return new SimpleSection(createdSection.id(), createdSection.name(), newItems);
     }
 
     @Override

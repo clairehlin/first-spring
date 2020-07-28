@@ -6,11 +6,13 @@ import com.claire.firstspring.model.SimpleRestaurant;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.util.Collections.emptySet;
 import static org.apache.commons.lang3.ArrayUtils.toArray;
 
 @Repository
@@ -63,20 +65,19 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
     }
 
     @Override
-    public Restaurant create(Restaurant restaurant) {
+    public Restaurant create(String restaurantName) {
         final int restaurantId = idGeneratingRepository.nextId(this);
-        String name = restaurant.name();
 
         jdbcTemplate.update(
             String.format("INSERT INTO %s.restaurant (id, name) VALUES (?, ?)", schemaName),
             restaurantId,
-            name
+            restaurantName
         );
 
         return new SimpleRestaurant(
             restaurantId,
-            name,
-            createdMenus(restaurantId, restaurant.menus())
+            restaurantName,
+            emptySet()
         );
     }
 
@@ -86,11 +87,17 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
 
     }
 
+    //TODO
+    @Override
+    public void updateRestaurantName(Integer id, String name) {
+
+    }
+
     private Set<Menu> createdMenus(int restaurantId, Set<Menu> menus) {
         Set<Menu> createdMenus = new HashSet<>();
 
         for (Menu menu : menus) {
-            final Menu menuWithId = menuRepository.create(restaurantId, menu);
+            final Menu menuWithId = menuRepository.create(restaurantId, menu.name());
             createdMenus.add(menuWithId);
         }
 

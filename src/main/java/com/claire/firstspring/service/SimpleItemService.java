@@ -4,6 +4,7 @@ import com.claire.firstspring.model.Feature;
 import com.claire.firstspring.model.Item;
 import com.claire.firstspring.repository.FeatureRepository;
 import com.claire.firstspring.repository.ItemRepository;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,9 @@ public class SimpleItemService implements ItemService {
 
     @Override
     public Item addNewItemToSection(Integer sectionId, Item item) {
+        Validate.notNull(sectionId, "section id cannot be null.");
+        Validate.notNull(item, "item cannot be null.");
+        Validate.isTrue(item.id() == null, "item id must be null for a new item");
         return itemRepository.create(sectionId, item);
     }
 
@@ -39,6 +43,8 @@ public class SimpleItemService implements ItemService {
 
     @Override
     public void deleteItem(Integer itemId) {
+        Item item = itemRepository.getItem(itemId);
+        itemRepository.disassociateFeatures(itemId, item.features());
         itemRepository.deleteItem(itemId);
     }
 

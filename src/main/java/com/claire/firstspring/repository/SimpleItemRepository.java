@@ -110,7 +110,7 @@ public class SimpleItemRepository implements ItemRepository {
     @Override
     public void associateFeatures(Integer itemId, Set<Feature> features) {
         for (Feature feature : features) {
-            final Integer featureId = featureRepository.id(feature);
+            final Integer featureId = featureRepository.id(feature).orElseThrow();
             insertRowFor(itemId, featureId);
         }
     }
@@ -118,7 +118,7 @@ public class SimpleItemRepository implements ItemRepository {
     @Override
     public void disassociateFeatures(Integer itemId, Set<Feature> features) {
         for (Feature feature : features) {
-            final Integer featureId = featureRepository.id(feature);
+            final Integer featureId = featureRepository.id(feature).orElseThrow();
             removeRowFor(itemId, featureId);
         }
     }

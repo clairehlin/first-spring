@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptySet;
 
@@ -82,7 +81,13 @@ public class RestaurantResource {
 
     @PostMapping
     public void createRestaurant(@RequestBody WebRestaurant webRestaurant) {
-        restaurantService.create(new SimpleRestaurant(null, webRestaurant.name, emptySet()));
+        restaurantService.create(
+            new SimpleRestaurant(
+                null,
+                webRestaurant.name,
+                new HashSet<>(menuMapper.toFirsts(webRestaurant.menus))
+            )
+        );
     }
 
     @PostMapping

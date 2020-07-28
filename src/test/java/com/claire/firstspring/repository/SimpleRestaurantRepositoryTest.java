@@ -65,7 +65,7 @@ class SimpleRestaurantRepositoryTest {
         SimpleRestaurant simpleRestaurant = new SimpleRestaurant(3, "Maui Cafe", menus);
 
         //when
-        simpleRestaurantRepository.create(simpleRestaurant);
+        simpleRestaurantRepository.create(simpleRestaurant.name());
 
         //then
         final List<Restaurant> restaurants = simpleRestaurantRepository.restaurants();

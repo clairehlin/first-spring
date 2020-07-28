@@ -43,10 +43,15 @@ class SimpleRestaurantServiceTest {
     @Autowired
     SimpleRestaurantRepository simpleRestaurantRepository;
     SimpleMenuRepository simpleMenuRepository;
+    SimpleMenuService simpleMenuService;
 
     @Test
     void can_get_a_list_of_restaurants() {
-        SimpleRestaurantService simpleRestaurantService = new SimpleRestaurantService(simpleRestaurantRepository, simpleMenuRepository);
+        SimpleRestaurantService simpleRestaurantService = new SimpleRestaurantService(
+            simpleRestaurantRepository,
+            simpleMenuRepository,
+            simpleMenuService
+        );
         assertThat(simpleRestaurantService.list())
             .hasSize(2);
     }

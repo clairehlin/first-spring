@@ -55,7 +55,7 @@ class SimpleMenuRepositoryTest {
         SimpleMenu simpleMenu = new SimpleMenu(4, "Kids Menu", sections);
 
         //when
-        simpleMenuRepository.create(1, simpleMenu);
+        simpleMenuRepository.create(1, simpleMenu.name());
 
         //then
         List<Menu> menus = simpleMenuRepository.menus();

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.util.Collections.emptySet;
 import static org.apache.commons.lang3.ArrayUtils.toArray;
 
 @Repository
@@ -66,21 +67,20 @@ public class SimpleMenuRepository implements MenuRepository {
     }
 
     @Override
-    public Menu create(Integer restaurantId, Menu menu) {
+    public Menu create(Integer restaurantId, String menuName) {
         final int menuId = idGeneratingRepository.nextId(this);
-        String name = menu.name();
 
         jdbcTemplate.update(
             String.format("INSERT INTO %s.menu (id, name, restaurant_id) VALUES (?, ?, ?)", schemaName),
             menuId,
-            name,
+            menuName,
             restaurantId
         );
 
         return new SimpleMenu(
             menuId,
-            name,
-            createdSections(menuId, menu.sections())
+            menuName,
+            emptySet()
         );
     }
 
@@ -100,7 +100,7 @@ public class SimpleMenuRepository implements MenuRepository {
         Set<Section> createdSections = new HashSet<>();
 
         for (Section section : sections) {
-            final Section sectionWithId = sectionRepository.create(menuId, section);
+            final Section sectionWithId = sectionRepository.create(menuId, section.name());
             createdSections.add(sectionWithId);
         }
         return createdSections;

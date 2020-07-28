@@ -4,6 +4,7 @@ import com.claire.firstspring.model.Feature;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static org.apache.commons.lang3.ArrayUtils.toArray;
@@ -29,9 +30,9 @@ public class SimpleFeatureRepository implements FeatureRepository {
             jdbcTemplate.query(
                 String.format(
                     "SELECT %s.feature.name AS name " +
-                    "FROM %s.feature INNER JOIN %s.item_feature " +
-                    "ON %s.feature.id = %s.item_feature.feature_id " +
-                    "WHERE %s.item_feature.item_id = ?",
+                        "FROM %s.feature INNER JOIN %s.item_feature " +
+                        "ON %s.feature.id = %s.item_feature.feature_id " +
+                        "WHERE %s.item_feature.item_id = ?",
                     schemaName,
                     schemaName,
                     schemaName,
@@ -46,11 +47,13 @@ public class SimpleFeatureRepository implements FeatureRepository {
     }
 
     @Override
-    public Integer id(Feature feature) {
-        return jdbcTemplate.queryForObject(
-            String.format("SELECT id FROM %s.feature WHERE name = ?", schemaName),
-            toArray(feature.name()),
-            Integer.class
+    public Optional<Integer> id(Feature feature) {
+        return Optional.ofNullable(
+            jdbcTemplate.queryForObject(
+                String.format("SELECT id FROM %s.feature WHERE name = ?", schemaName),
+                toArray(feature.name()),
+                Integer.class
+            )
         );
     }
 

@@ -10,7 +10,9 @@ public interface RestaurantRepository extends MainTableAwareRepository {
 
     Optional<Restaurant> restaurant(Integer id);
 
-    Restaurant create(Restaurant restaurant);
-
     void delete(Integer restaurantId);
+
+    void updateRestaurantName(Integer id, String name);
+
+    Restaurant create(String name);
 }

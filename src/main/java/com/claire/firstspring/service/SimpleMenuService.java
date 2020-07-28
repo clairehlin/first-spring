@@ -2,6 +2,8 @@ package com.claire.firstspring.service;
 
 import com.claire.firstspring.model.Menu;
 import com.claire.firstspring.model.Section;
+import com.claire.firstspring.model.SimpleMenu;
+import com.claire.firstspring.model.SimpleRestaurant;
 import com.claire.firstspring.repository.MenuRepository;
 import com.claire.firstspring.repository.SectionRepository;
 import org.apache.commons.lang3.Validate;
@@ -30,7 +32,18 @@ public class SimpleMenuService implements MenuService {
 
     @Override
     public Menu addMenu(Integer restaurantId, Menu menu) {
-        return menuRepository.create(restaurantId, menu);
+        Validate.notNull(restaurantId, "restaurant id cannot be null.");
+        Validate.notNull(menu, "menu cannot be null.");
+        Validate.isTrue(menu.id() == null, "menu id must be null to create a new menu.");
+
+        final Menu createdMenu = menuRepository.create(restaurantId, menu.name());
+
+        final Set<Section> newSections = menu.sections()
+            .stream()
+            .map(section -> sectionService.addSection(createdMenu.id(), section))
+            .collect(toSet());
+
+        return new SimpleMenu(createdMenu.id(), createdMenu.name(), newSections);
     }
 
     @Override
@@ -95,7 +108,7 @@ public class SimpleMenuService implements MenuService {
         Validate.notNull(menuId, "menu id cannot be null.");
         Menu menu = this.menu(menuId);
         Set<Section> sections = menu.sections();
-        sections.forEach(section -> sectionRepository.deleteSection(section.id()));
+        sections.forEach(section -> sectionService.deleteSection(section.id()));
         menuRepository.delete(menuId);
     }
 }

@@ -7,9 +7,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.ArrayUtils.toArray;
 
 @Repository
@@ -59,21 +61,20 @@ public class SimpleSectionRepository implements SectionRepository {
     }
 
     @Override
-    public Section create(Integer menuId, Section section) {
+    public Section create(Integer menuId, String sectionName) {
         final int sectionId = idGeneratingRepository.nextId(this);
-        String name = section.name();
 
         jdbcTemplate.update(
             String.format("INSERT INTO %s.section (id, name, menu_id) VALUES (?, ?, ?)", schemaName),
             sectionId,
-            name,
+            sectionName,
             menuId
         );
 
         return new SimpleSection(
             sectionId,
-            name,
-            createdItems(sectionId, section.items())
+            sectionName,
+            emptyList()
         );
     }
 
