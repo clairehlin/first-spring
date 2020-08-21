@@ -1,5 +1,6 @@
 package com.claire.firstspring.model;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class SimpleItem implements Item {
@@ -41,6 +42,27 @@ public class SimpleItem implements Item {
     @Override
     public Set<Feature> features() {
         return Set.copyOf(features);
+    }
+
+    public SimpleItem withId(Integer id) {
+        return new SimpleItem(id, name, description, price, features);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SimpleItem that = (SimpleItem) o;
+        return Double.compare(that.price, price) == 0 &&
+            Objects.equals(id, that.id) &&
+            Objects.equals(name, that.name) &&
+            Objects.equals(description, that.description) &&
+            Objects.equals(features, that.features);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, price, features);
     }
 
     @Override

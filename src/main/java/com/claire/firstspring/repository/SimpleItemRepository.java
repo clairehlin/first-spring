@@ -3,6 +3,7 @@ package com.claire.firstspring.repository;
 import com.claire.firstspring.model.Feature;
 import com.claire.firstspring.model.Item;
 import com.claire.firstspring.model.SimpleItem;
+import org.apache.commons.lang3.Validate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -17,22 +18,21 @@ public class SimpleItemRepository implements ItemRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final ItemRowMapper itemRowMapper;
-    private final String schemaName;
     private final IdGeneratingRepository idGeneratingRepository;
     private final FeatureRepository featureRepository;
 
-    public SimpleItemRepository(JdbcTemplate jdbcTemplate, ItemRowMapper itemRowMapper, String schemaName, IdGeneratingRepository idGeneratingRepository, FeatureRepository featureRepository) {
+    public SimpleItemRepository(JdbcTemplate jdbcTemplate, ItemRowMapper itemRowMapper, IdGeneratingRepository idGeneratingRepository, FeatureRepository featureRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.itemRowMapper = itemRowMapper;
-        this.schemaName = schemaName;
         this.idGeneratingRepository = idGeneratingRepository;
         this.featureRepository = featureRepository;
     }
 
     @Override
     public List<Item> sectionItems(Integer sectionId) {
+        Validate.notNull(sectionId, "section id cannot be null");
         return jdbcTemplate.query(
-            String.format("SELECT * FROM %s.item WHERE section_id = ?", schemaName),
+            "SELECT * FROM item WHERE section_id = ?",
             toArray(sectionId),
             itemRowMapper
         );
@@ -40,13 +40,14 @@ public class SimpleItemRepository implements ItemRepository {
 
     @Override
     public Item create(Integer sectionId, Item item) {
+        Validate.notNull(item, "item cannot be null");
         final int itemId = idGeneratingRepository.nextId(this);
         String name = item.name();
         String description = item.description();
         double price = item.price();
 
         jdbcTemplate.update(
-            String.format("INSERT INTO %s.item (id, name, description, price, section_id) VALUES (?, ?, ?, ?, ?)", schemaName),
+            "INSERT INTO item (id, name, description, price, section_id) VALUES (?, ?, ?, ?, ?)",
             itemId,
             name,
             description,
@@ -67,15 +68,16 @@ public class SimpleItemRepository implements ItemRepository {
     @Override
     public List<Item> list() {
         return jdbcTemplate.query(
-            String.format("SELECT * FROM %s.item", schemaName),
+            "SELECT * FROM item",
             itemRowMapper
         );
     }
 
     @Override
     public Item getItem(Integer itemId) {
+        Validate.notNull(itemId, "item id cannot be null");
         return jdbcTemplate.queryForObject(
-            String.format("SELECT * FROM %s.item WHERE id = ?", schemaName),
+            "SELECT * FROM item WHERE id = ?",
             itemRowMapper,
             itemId
         );
@@ -83,8 +85,9 @@ public class SimpleItemRepository implements ItemRepository {
 
     @Override
     public void deleteItem(Integer itemId) {
+        Validate.notNull(itemId, "item id cannot be null");
         final int updated = jdbcTemplate.update(
-            String.format("DELETE FROM %s.item WHERE id = ?", schemaName),
+            "DELETE FROM item WHERE id = ?",
             itemId
         );
         if (updated < 1) {
@@ -94,8 +97,9 @@ public class SimpleItemRepository implements ItemRepository {
 
     @Override
     public void updateItemIgnoringFeatures(Item item) {
+        Validate.notNull(item.id());
         final int updated = jdbcTemplate.update(
-            String.format("UPDATE %s.item SET name = ?, description = ?, price = ? WHERE id =?", schemaName),
+            "UPDATE item SET name = ?, description = ?, price = ? WHERE id =?",
             item.name(),
             item.description(),
             item.price(),
@@ -103,12 +107,14 @@ public class SimpleItemRepository implements ItemRepository {
         );
 
         if (updated < 1) {
-            throw new NoSuchElementException("could not update and item with id " + item.id() + ", perhaps it does not exist");
+            throw new NoSuchElementException("could not update and item with id " + item.id() + ", perhaps item does not exist");
         }
     }
 
     @Override
     public void associateFeatures(Integer itemId, Set<Feature> features) {
+        Validate.notNull(itemId);
+        Validate.notEmpty(features, "features cannot be empty");
         for (Feature feature : features) {
             final Integer featureId = featureRepository.id(feature).orElseThrow();
             insertRowFor(itemId, featureId);
@@ -117,6 +123,8 @@ public class SimpleItemRepository implements ItemRepository {
 
     @Override
     public void disassociateFeatures(Integer itemId, Set<Feature> features) {
+        Validate.notNull(itemId);
+        Validate.notEmpty(features, "features cannot be empty");
         for (Feature feature : features) {
             final Integer featureId = featureRepository.id(feature).orElseThrow();
             removeRowFor(itemId, featureId);
@@ -124,16 +132,22 @@ public class SimpleItemRepository implements ItemRepository {
     }
 
     private void removeRowFor(Integer itemId, Integer featureId) {
-        jdbcTemplate.update(
-            String.format("DELETE FROM %s.item_feature WHERE item_id = ? AND feature_id = ?", schemaName),
+        final int updated = jdbcTemplate.update(
+            "DELETE FROM item_feature WHERE item_id = ? AND feature_id = ?",
             itemId,
             featureId
         );
+
+        if (updated < 1) {
+            throw new NoSuchElementException(
+                String.format("cannot find matching records for parameters item id = %s, feature id = %s", itemId, featureId)
+            );
+        }
     }
 
     private void insertRowFor(Integer itemId, Integer featureId) {
         jdbcTemplate.update(
-            String.format("INSERT INTO %s.item_feature (item_id, feature_id) VALUES (?, ?)", schemaName),
+            "INSERT INTO item_feature (item_id, feature_id) VALUES (?, ?)",
             itemId,
             featureId
         );
@@ -142,6 +156,6 @@ public class SimpleItemRepository implements ItemRepository {
 
     @Override
     public String getMainTableName() {
-        return String.format("%s.item", schemaName);
+        return "item";
     }
 }

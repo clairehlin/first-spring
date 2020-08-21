@@ -53,15 +53,3 @@ CREATE TABLE item_feature (
     CONSTRAINT FK_item_feature_item FOREIGN KEY (item_id) REFERENCES item (id),
     CONSTRAINT FK_item_feature_feature FOREIGN KEY (feature_id) REFERENCES feature (id)
 );
-
-
-
-
-
-
-
-
-
-
-
-

@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 /**
  * get one - done
@@ -55,8 +55,7 @@ public class MenuResource {
         this.sectionMapper = sectionMapper;
     }
 
-    @GetMapping
-    public List<WebMenu> menus() {
+    private List<WebMenu> menus() {
         return menuService.list()
             .stream()
             .map(menuMapper::toSecond)
@@ -71,9 +70,9 @@ public class MenuResource {
 
     @GetMapping
     public List<WebMenu> menus(@RequestParam List<Integer> ids) {
-        final Stream<Integer> stream = ids.stream();
-        final Stream<Integer> integerStream = stream.map(integer -> integer + 1);
-        return ids.stream()
+        return emptyIfNull(ids).isEmpty()
+            ? menus()
+            : ids.stream()
             .map(menuService::menu)
             .map(menuMapper::toSecond)
             .collect(toList());

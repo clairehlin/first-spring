@@ -22,9 +22,6 @@ public class PersistenceConfig {
     @Value("${database.password}")
     private String databasePassword;
 
-    @Value("${spring.flyway.default-schema}")
-    private String schema;
-
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -34,11 +31,6 @@ public class PersistenceConfig {
         dataSource.setPassword(databasePassword);
 
         return dataSource;
-    }
-
-    @Bean
-    public String schemaName() {
-        return '\"' + schema + '\"';
     }
 
     @Bean

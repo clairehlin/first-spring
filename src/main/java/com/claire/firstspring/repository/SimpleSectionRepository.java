@@ -1,14 +1,12 @@
 package com.claire.firstspring.repository;
 
-import com.claire.firstspring.model.Item;
 import com.claire.firstspring.model.Section;
 import com.claire.firstspring.model.SimpleSection;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static java.util.Collections.emptyList;
@@ -19,23 +17,19 @@ public class SimpleSectionRepository implements SectionRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final SectionRowMapper sectionRowMapper;
-    private final String schemaName;
     private final IdGeneratingRepository idGeneratingRepository;
-    private final ItemRepository itemRepository;
 
 
-    public SimpleSectionRepository(JdbcTemplate jdbcTemplate, SectionRowMapper sectionRowMapper, String schemaName, IdGeneratingRepository idGeneratingRepository, ItemRepository itemRepository) {
+    public SimpleSectionRepository(JdbcTemplate jdbcTemplate, SectionRowMapper sectionRowMapper, IdGeneratingRepository idGeneratingRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.sectionRowMapper = sectionRowMapper;
-        this.schemaName = schemaName;
         this.idGeneratingRepository = idGeneratingRepository;
-        this.itemRepository = itemRepository;
     }
 
     @Override
     public List<Section> sections() {
         return jdbcTemplate.query(
-            String.format("SELECT * FROM %s.sections LIMIT 101", schemaName),
+            "SELECT * FROM sections LIMIT 101",
             sectionRowMapper
         );
     }
@@ -43,7 +37,7 @@ public class SimpleSectionRepository implements SectionRepository {
     @Override
     public Optional<Section> section(Integer id) {
         Section section = jdbcTemplate.queryForObject(
-            String.format("SELECT * FROM %s.section WHERE id = ?", schemaName),
+            "SELECT * FROM section WHERE id = ?",
             toArray(id),
             sectionRowMapper
         );
@@ -53,7 +47,7 @@ public class SimpleSectionRepository implements SectionRepository {
     @Override
     public List<Section> menuSections(Integer menuId) {
         return jdbcTemplate.query(
-            String.format("SELECT * FROM %s.section WHERE menu_id = ?", schemaName),
+            "SELECT * FROM section WHERE menu_id = ?",
             toArray(menuId),
             sectionRowMapper
         );
@@ -65,7 +59,7 @@ public class SimpleSectionRepository implements SectionRepository {
         final int sectionId = idGeneratingRepository.nextId(this);
 
         jdbcTemplate.update(
-            String.format("INSERT INTO %s.section (id, name, menu_id) VALUES (?, ?, ?)", schemaName),
+            "INSERT INTO section (id, name, menu_id) VALUES (?, ?, ?)",
             sectionId,
             sectionName,
             menuId
@@ -78,30 +72,35 @@ public class SimpleSectionRepository implements SectionRepository {
         );
     }
 
-    //TODO
     @Override
     public void deleteSection(Integer sectionId) {
+        final int deleted = jdbcTemplate.update(
+            "DELETE FROM section WHERE id = ?",
+            sectionId
+        );
 
+        if (deleted < 1) {
+            throw new NoSuchElementException("could not find section with section id " + sectionId);
+        }
     }
 
-    //TODO
     @Override
     public void updateSectionName(Integer id, String name) {
+        final int updated = jdbcTemplate.update(
+            "UPDATE section SET name = ? WHERE id = ?",
+            name,
+            id
+        );
 
-    }
-
-    private List<Item> createdItems(int sectionId, List<Item> items) {
-        List<Item> createdItems = new ArrayList<>();
-
-        for (Item item : items){
-            final Item itemWithId = itemRepository.create(sectionId, item);
-            createdItems.add(itemWithId);
+        if (updated < 1) {
+            throw new NoSuchElementException(
+                String.format("could not update section name %s, perhaps section with id %s does not exist", name, id)
+            );
         }
-        return createdItems;
     }
 
     @Override
     public String getMainTableName() {
-        return String.format("%s.section", schemaName);
+        return "section";
     }
 }

@@ -1,16 +1,13 @@
 package com.claire.firstspring.repository;
 
-import com.claire.firstspring.model.Menu;
 import com.claire.firstspring.model.Restaurant;
 import com.claire.firstspring.model.SimpleRestaurant;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.util.Collections.emptySet;
 import static org.apache.commons.lang3.ArrayUtils.toArray;
@@ -20,28 +17,24 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final RestaurantRowMapper restaurantRowMapper;
-    private final String schemaName;
     private final IdGeneratingRepository idGeneratingRepository;
-    private final MenuRepository menuRepository;
 
 
-    public SimpleRestaurantRepository(JdbcTemplate jdbcTemplate, RestaurantRowMapper restaurantRowMapper, String schemaName, IdGeneratingRepository idGeneratingRepository, MenuRepository menuRepository) {
+    public SimpleRestaurantRepository(JdbcTemplate jdbcTemplate, RestaurantRowMapper restaurantRowMapper, IdGeneratingRepository idGeneratingRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.restaurantRowMapper = restaurantRowMapper;
-        this.schemaName = schemaName;
         this.idGeneratingRepository = idGeneratingRepository;
-        this.menuRepository = menuRepository;
     }
 
     @Override
     public List<Restaurant> restaurants() {
         final List<Restaurant> restaurants = jdbcTemplate.query(
-            String.format("SELECT * FROM %s.restaurant LIMIT 101", schemaName),
+            "SELECT * FROM restaurant LIMIT 101",
             restaurantRowMapper
         );
         if (restaurants.size() > 100) {
             final Integer restaurantCount = jdbcTemplate.queryForObject(
-                String.format("SELECT COUNT(*) FROM %s.restaurant", schemaName),
+                "SELECT COUNT(*) FROM restaurant",
                 Integer.class
             );
             throw new RuntimeException("too many rows of restaurants in database: " + restaurantCount);
@@ -52,7 +45,7 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
     @Override
     public Optional<Restaurant> restaurant(Integer id) {
         List<Restaurant> listOfRestaurant = jdbcTemplate.query(
-            String.format("SELECT * FROM %s.restaurant LIMIT 101", schemaName),
+            "SELECT * FROM restaurant LIMIT 101",
             restaurantRowMapper
         );
         if (listOfRestaurant.size() > 100) {
@@ -69,7 +62,7 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
         final int restaurantId = idGeneratingRepository.nextId(this);
 
         jdbcTemplate.update(
-            String.format("INSERT INTO %s.restaurant (id, name) VALUES (?, ?)", schemaName),
+            "INSERT INTO restaurant (id, name) VALUES (?, ?)",
             restaurantId,
             restaurantName
         );
@@ -81,32 +74,45 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
         );
     }
 
-    //TODO
     @Override
     public void delete(Integer restaurantId) {
+        final int deleted = jdbcTemplate.update(
+            "DELETE from restaurant WHERE id = ?",
+            restaurantId
+        );
 
-    }
-
-    //TODO
-    @Override
-    public void updateRestaurantName(Integer id, String name) {
-
-    }
-
-    private Set<Menu> createdMenus(int restaurantId, Set<Menu> menus) {
-        Set<Menu> createdMenus = new HashSet<>();
-
-        for (Menu menu : menus) {
-            final Menu menuWithId = menuRepository.create(restaurantId, menu.name());
-            createdMenus.add(menuWithId);
+        if (deleted < 1) {
+            throw new NoSuchElementException(
+                "could not delete restaurant with id " + restaurantId +
+                    ", perhaps it does not exist."
+            );
         }
 
-        return createdMenus;
+    }
+
+    @Override
+    public void updateRestaurantName(Integer id, String name) {
+        final int updated = jdbcTemplate.update(
+            "UPDATE from restaurant SET name = ? WHERE id = ?",
+            name,
+            id
+        );
+
+        if (updated < 1) {
+            throw new NoSuchElementException(
+                String.format(
+                    "could not update restaurant name with new name %s, perhaps restaurant id %s does not exist.",
+                    name,
+                    id
+                )
+            );
+        }
+
     }
 
     public Optional<Restaurant> restaurant2(Integer id) {
         Restaurant restaurant = jdbcTemplate.queryForObject(
-            String.format("SELECT * FROM %s.restaurant WHERE id = ?", schemaName),
+            "SELECT * FROM restaurant WHERE id = ?",
             toArray(id),
             restaurantRowMapper
         );
@@ -115,25 +121,6 @@ public class SimpleRestaurantRepository implements RestaurantRepository {
 
     @Override
     public String getMainTableName() {
-        return String.format("%s.restaurant", schemaName);
+        return "restaurant";
     }
-
-    /*
-    method called : queryForObject()
-    number of parameters: 3
-    parameters: String, Array, RowMapper
-
-    method called: format()
-    number of parameters: 2
-    parameters: String, varargs Objects
-
-    method called: toArray()
-    number of parameters: 1
-    parameters: varargs T
-
-    method called: ofNullable()
-    number of parameters: 1
-    parameters: T
-
-     */
 }

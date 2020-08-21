@@ -1,15 +1,13 @@
 package com.claire.firstspring.repository;
 
 import com.claire.firstspring.model.Menu;
-import com.claire.firstspring.model.Section;
 import com.claire.firstspring.model.SimpleMenu;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.util.Collections.emptySet;
 import static org.apache.commons.lang3.ArrayUtils.toArray;
@@ -20,26 +18,22 @@ public class SimpleMenuRepository implements MenuRepository {
     private final JdbcTemplate jdbcTemplate;
     private final MenuRowMapper menuRowMapper;
     private final IdGeneratingRepository idGeneratingRepository;
-    private final String schemaName;
-    private final SectionRepository sectionRepository;
 
-    public SimpleMenuRepository(JdbcTemplate jdbcTemplate, MenuRowMapper menuRowMapper, IdGeneratingRepository idGeneratingRepository, String schemaName, SectionRepository sectionRepository) {
+    public SimpleMenuRepository(JdbcTemplate jdbcTemplate, MenuRowMapper menuRowMapper, IdGeneratingRepository idGeneratingRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.menuRowMapper = menuRowMapper;
         this.idGeneratingRepository = idGeneratingRepository;
-        this.schemaName = schemaName;
-        this.sectionRepository = sectionRepository;
     }
 
     @Override
     public List<Menu> menus() {
         final List<Menu> menus = jdbcTemplate.query(
-            String.format("SELECT * FROM %s.menu LIMIT 101", schemaName),
+            "SELECT * FROM menu LIMIT 101",
             menuRowMapper
         );
         if (menus.size() > 100) {
             final Integer menusCount = jdbcTemplate.queryForObject(
-                String.format("SELECT COUNT(*) FROM %s.menu", schemaName),
+                "SELECT COUNT(*) FROM menu",
                 Integer.class
             );
             throw new RuntimeException("too many rows of menus in database: " + menusCount);
@@ -50,7 +44,7 @@ public class SimpleMenuRepository implements MenuRepository {
     @Override
     public Optional<Menu> menu(Integer menuId) {
         Menu menu = jdbcTemplate.queryForObject(
-            String.format("SELECT * FROM %s.menu WHERE id = ?", schemaName),
+            "SELECT * FROM menu WHERE id = ?",
             toArray(menuId),
             menuRowMapper
         );
@@ -60,7 +54,7 @@ public class SimpleMenuRepository implements MenuRepository {
     @Override
     public List<Menu> restaurantMenus(Integer restaurantId) {
         return jdbcTemplate.query(
-            String.format("SELECT * FROM %s.menu WHERE restaurant_id = ?", schemaName),
+            "SELECT * FROM menu WHERE restaurant_id = ?",
             toArray(restaurantId),
             menuRowMapper
         );
@@ -71,7 +65,7 @@ public class SimpleMenuRepository implements MenuRepository {
         final int menuId = idGeneratingRepository.nextId(this);
 
         jdbcTemplate.update(
-            String.format("INSERT INTO %s.menu (id, name, restaurant_id) VALUES (?, ?, ?)", schemaName),
+            "INSERT INTO menu (id, name, restaurant_id) VALUES (?, ?, ?)",
             menuId,
             menuName,
             restaurantId
@@ -84,30 +78,39 @@ public class SimpleMenuRepository implements MenuRepository {
         );
     }
 
-    //TODO
     @Override
     public void delete(Integer menuId) {
+        final int deleted = jdbcTemplate.update(
+            "DELETE from menu WHERE id = ?",
+            menuId
+        );
+
+        if (deleted < 1) {
+            throw new NoSuchElementException("could not find menu id " + menuId);
+        }
 
     }
 
-    //TODO
     @Override
     public void updateMenuName(Integer id, String name) {
+        final int updated = jdbcTemplate.update(
+            "UPDATE menu SET name = ? WHERE id = ?",
+            name,
+            id
+        );
 
-    }
-
-    private Set<Section> createdSections(int menuId, Set<Section> sections) {
-        Set<Section> createdSections = new HashSet<>();
-
-        for (Section section : sections) {
-            final Section sectionWithId = sectionRepository.create(menuId, section.name());
-            createdSections.add(sectionWithId);
+        if (updated < 1) {
+            throw new NoSuchElementException(
+                String.format("could not update menu name with new name %s, perhaps menu id %s does not exist",
+                    name,
+                    id
+                )
+            );
         }
-        return createdSections;
     }
 
     @Override
     public String getMainTableName() {
-        return String.format("%s.menu", schemaName);
+        return "menu";
     }
 }

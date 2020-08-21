@@ -1,9 +1,11 @@
 package com.claire.firstspring.repository;
 
 import com.claire.firstspring.model.Feature;
+import com.claire.firstspring.model.Item;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,13 +16,11 @@ public class SimpleFeatureRepository implements FeatureRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final FeatureRowMapper featureRowMapper;
-    private final String schemaName;
     private final IdGeneratingRepository idGeneratingRepository;
 
-    public SimpleFeatureRepository(JdbcTemplate jdbcTemplate, FeatureRowMapper featureRowMapper, String schemaName, IdGeneratingRepository idGeneratingRepository) {
+    public SimpleFeatureRepository(JdbcTemplate jdbcTemplate, FeatureRowMapper featureRowMapper, IdGeneratingRepository idGeneratingRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.featureRowMapper = featureRowMapper;
-        this.schemaName = schemaName;
         this.idGeneratingRepository = idGeneratingRepository;
     }
 
@@ -28,18 +28,10 @@ public class SimpleFeatureRepository implements FeatureRepository {
     public Set<Feature> itemFeatures(Integer itemId) {
         return Set.copyOf(
             jdbcTemplate.query(
-                String.format(
-                    "SELECT %s.feature.name AS name " +
-                        "FROM %s.feature INNER JOIN %s.item_feature " +
-                        "ON %s.feature.id = %s.item_feature.feature_id " +
-                        "WHERE %s.item_feature.item_id = ?",
-                    schemaName,
-                    schemaName,
-                    schemaName,
-                    schemaName,
-                    schemaName,
-                    schemaName
-                ),
+                "SELECT feature.name AS name " +
+                    "FROM feature INNER JOIN item_feature " +
+                    "ON feature.id = item_feature.feature_id " +
+                    "WHERE item_feature.item_id = ?",
                 toArray(itemId),
                 featureRowMapper
             )
@@ -50,7 +42,7 @@ public class SimpleFeatureRepository implements FeatureRepository {
     public Optional<Integer> id(Feature feature) {
         return Optional.ofNullable(
             jdbcTemplate.queryForObject(
-                String.format("SELECT id FROM %s.feature WHERE name = ?", schemaName),
+                "SELECT id FROM feature WHERE name = ?",
                 toArray(feature.name()),
                 Integer.class
             )
@@ -61,7 +53,7 @@ public class SimpleFeatureRepository implements FeatureRepository {
     public Set<Feature> list() {
         return Set.copyOf(
             jdbcTemplate.query(
-                String.format("SELECT name FROM %s.feature", schemaName),
+                "SELECT name FROM feature",
                 featureRowMapper
             )
         );
@@ -71,26 +63,41 @@ public class SimpleFeatureRepository implements FeatureRepository {
     public void create(Feature feature) {
         int id = idGeneratingRepository.nextId(this);
         jdbcTemplate.update(
-            String.format("INSERT INTO %s.feature (id, name) VALUES (?, ?)", schemaName),
+            "INSERT INTO feature (id, name) VALUES (?, ?)",
             id,
             feature.name()
         );
     }
 
-    //TODO
     @Override
     public void delete(String featureName) {
+        final int updated = jdbcTemplate.update(
+            "DELETE FROM feature WHERE name = ?",
+            featureName
+        );
 
+        if (updated < 1) {
+            throw new NoSuchElementException("could not delete a feature with feature name " + featureName +
+                ", perhaps it does not exist");
+        }
     }
 
-    //TODO
     @Override
     public void update(String currentName, String newName) {
+        final int updated = jdbcTemplate.update(
+            "UPDATE feature SET name = ? WHERE name = ?",
+            newName,
+            currentName
+        );
 
+        if (updated < 1) {
+            throw new NoSuchElementException("could not update a feature with feature name " + currentName +
+                ", perhaps it does not exist");
+        }
     }
 
     @Override
     public String getMainTableName() {
-        return String.format("%s.feature", schemaName);
+        return "feature";
     }
 }

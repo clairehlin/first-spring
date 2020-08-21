@@ -79,8 +79,7 @@ public class RestaurantResource {
         webRestaurants.forEach(webRestaurant -> this.updateRestaurant(webRestaurant.id, webRestaurant));
     }
 
-    @PostMapping
-    public void createRestaurant(@RequestBody WebRestaurant webRestaurant) {
+    private void createRestaurant(@RequestBody WebRestaurant webRestaurant) {
         restaurantService.create(
             new SimpleRestaurant(
                 null,
