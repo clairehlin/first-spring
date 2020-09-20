@@ -19,17 +19,6 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 
-/**
- * get all - done
- * get one - done
- * update multiple - done
- * update one - done
- * delete one - done
- * delete multiple - done
- * create one feature
- * create multiple feature
- */
-
 @RestController
 @RequestMapping("/features")
 public class FeatureResource {

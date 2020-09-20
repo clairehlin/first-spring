@@ -5,22 +5,28 @@ import com.claire.firstspring.model.Item;
 import com.claire.firstspring.repository.FeatureRepository;
 import com.claire.firstspring.repository.ItemRepository;
 import org.apache.commons.lang3.Validate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.ArrayUtils.toArray;
 
 @Service
 public class SimpleItemService implements ItemService {
 
     private final ItemRepository itemRepository;
     private final FeatureRepository featureRepository;
+    private final JdbcTemplate jdbcTemplate;
 
-    public SimpleItemService(ItemRepository itemRepository, FeatureRepository featureRepository) {
+    public SimpleItemService(ItemRepository itemRepository, FeatureRepository featureRepository, JdbcTemplate jdbcTemplate) {
         this.itemRepository = itemRepository;
         this.featureRepository = featureRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -28,7 +34,22 @@ public class SimpleItemService implements ItemService {
         Validate.notNull(sectionId, "section id cannot be null.");
         Validate.notNull(item, "item cannot be null.");
         Validate.isTrue(item.id() == null, "item id must be null for a new item");
+        validateSectionExists(sectionId);
         return itemRepository.create(sectionId, item);
+    }
+
+    private void validateSectionExists(Integer sectionId) {
+        final boolean sectionExists = Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                "SELECT count(*) FROM section WHERE id = ?",
+                toArray(sectionId),
+                Integer.class
+                )
+        ) > 0;
+
+        if (!sectionExists) {
+            throw new NoSuchElementException(String.format("section id %s does not exist", sectionId));
+        }
     }
 
     @Override
@@ -44,7 +65,9 @@ public class SimpleItemService implements ItemService {
     @Override
     public void deleteItem(Integer itemId) {
         Item item = itemRepository.getItem(itemId);
-        itemRepository.disassociateFeatures(itemId, item.features());
+        if (!item.features().isEmpty()) {
+            itemRepository.disassociateFeatures(itemId, item.features());
+        }
         itemRepository.deleteItem(itemId);
     }
 
@@ -53,10 +76,14 @@ public class SimpleItemService implements ItemService {
         final Set<Feature> features = featureRepository.itemFeatures(item.id());
 
         final Set<Feature> removedFeatures = removedFeatures(features, item.features());
-        itemRepository.disassociateFeatures(item.id(), removedFeatures);
+        if (!removedFeatures.isEmpty()) {
+            itemRepository.disassociateFeatures(item.id(), removedFeatures);
+        }
 
         final Set<Feature> addedFeatures = addedFeatures(features, item.features());
-        itemRepository.associateFeatures(item.id(), addedFeatures);
+        if (!addedFeatures.isEmpty()) {
+            itemRepository.associateFeatures(item.id(), addedFeatures);
+        }
 
         itemRepository.updateItemIgnoringFeatures(item);
     }

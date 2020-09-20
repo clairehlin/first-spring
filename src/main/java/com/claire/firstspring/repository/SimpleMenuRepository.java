@@ -2,11 +2,13 @@ package com.claire.firstspring.repository;
 
 import com.claire.firstspring.model.Menu;
 import com.claire.firstspring.model.SimpleMenu;
+import org.apache.commons.lang3.Validate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Collections.emptySet;
@@ -31,6 +33,7 @@ public class SimpleMenuRepository implements MenuRepository {
             "SELECT * FROM menu LIMIT 101",
             menuRowMapper
         );
+
         if (menus.size() > 100) {
             final Integer menusCount = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM menu",
@@ -43,6 +46,9 @@ public class SimpleMenuRepository implements MenuRepository {
 
     @Override
     public Optional<Menu> menu(Integer menuId) {
+        Validate.notNull(menuId);
+        validateMenuExists(menuId);
+
         Menu menu = jdbcTemplate.queryForObject(
             "SELECT * FROM menu WHERE id = ?",
             toArray(menuId),
@@ -51,8 +57,26 @@ public class SimpleMenuRepository implements MenuRepository {
         return Optional.ofNullable(menu);
     }
 
+    private void validateMenuExists(Integer menuId) {
+        final boolean menuExists = Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                "SELECT count(*) FROM menu WHERE id = ?",
+                toArray(menuId),
+                Integer.class
+            )
+        ) > 0;
+
+        if (!menuExists) {
+            throw new NoSuchElementException(
+                String.format("menu with menu id %s does not exist in menu table", menuId)
+            );
+        }
+    }
+
     @Override
     public List<Menu> restaurantMenus(Integer restaurantId) {
+        Validate.notNull(restaurantId);
+        validateRestaurantExists(restaurantId);
         return jdbcTemplate.query(
             "SELECT * FROM menu WHERE restaurant_id = ?",
             toArray(restaurantId),
@@ -60,9 +84,30 @@ public class SimpleMenuRepository implements MenuRepository {
         );
     }
 
+    private void validateRestaurantExists(Integer restaurantId) {
+        final boolean restaurantExists = Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                "SELECT count(*) FROM restaurant WHERE id = ?",
+                toArray(restaurantId),
+                Integer.class
+            )
+        ) > 0;
+
+        if (!restaurantExists) {
+            throw new NoSuchElementException(
+                String.format(
+                    "restaurant with restaurant id %s does not exist in restaurant able",
+                    restaurantId)
+            );
+        }
+    }
+
     @Override
     public Menu create(Integer restaurantId, String menuName) {
         final int menuId = idGeneratingRepository.nextId(this);
+        Validate.notEmpty(menuName, "menu name cannot be empty");
+        Validate.notNull(restaurantId, "restaurant id cannot be empty");
+        validateRestaurantExists(restaurantId);
 
         jdbcTemplate.update(
             "INSERT INTO menu (id, name, restaurant_id) VALUES (?, ?, ?)",
@@ -80,6 +125,7 @@ public class SimpleMenuRepository implements MenuRepository {
 
     @Override
     public void delete(Integer menuId) {
+        Validate.notNull(menuId, "menu id cannot be empty");
         final int deleted = jdbcTemplate.update(
             "DELETE from menu WHERE id = ?",
             menuId
@@ -93,6 +139,10 @@ public class SimpleMenuRepository implements MenuRepository {
 
     @Override
     public void updateMenuName(Integer id, String name) {
+        Validate.notNull(id, "menu id cannot be empty");
+        Validate.notEmpty(name, "menu name cannot be empty");
+        validateMenuExists(id);
+
         final int updated = jdbcTemplate.update(
             "UPDATE menu SET name = ? WHERE id = ?",
             name,

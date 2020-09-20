@@ -133,6 +133,14 @@ class SimpleItemRepositoryTest {
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("section id cannot be null");
         }
+
+        @Test
+        void fails_if_section_id_is_not_found() {
+            // when
+            // then
+            assertThatCode(() -> simpleItemRepository.sectionItems(222))
+                .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     @Nested
@@ -383,7 +391,7 @@ class SimpleItemRepositoryTest {
 
             // when/then
             assertThatCode(() -> simpleItemRepository.associateFeatures(1, features))
-                .isInstanceOf(EmptyResultDataAccessException.class);
+                .isInstanceOf(NoSuchElementException.class);
         }
     }
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.apache.commons.lang3.ArrayUtils.toArray;
@@ -21,7 +22,12 @@ public class SimpleItemRepository implements ItemRepository {
     private final IdGeneratingRepository idGeneratingRepository;
     private final FeatureRepository featureRepository;
 
-    public SimpleItemRepository(JdbcTemplate jdbcTemplate, ItemRowMapper itemRowMapper, IdGeneratingRepository idGeneratingRepository, FeatureRepository featureRepository) {
+    public SimpleItemRepository(
+        JdbcTemplate jdbcTemplate,
+        ItemRowMapper itemRowMapper,
+        IdGeneratingRepository idGeneratingRepository,
+        FeatureRepository featureRepository
+    ) {
         this.jdbcTemplate = jdbcTemplate;
         this.itemRowMapper = itemRowMapper;
         this.idGeneratingRepository = idGeneratingRepository;
@@ -31,11 +37,26 @@ public class SimpleItemRepository implements ItemRepository {
     @Override
     public List<Item> sectionItems(Integer sectionId) {
         Validate.notNull(sectionId, "section id cannot be null");
+        validateSectionExists(sectionId);
+
         return jdbcTemplate.query(
             "SELECT * FROM item WHERE section_id = ?",
             toArray(sectionId),
             itemRowMapper
         );
+    }
+
+    private void validateSectionExists(Integer sectionId) {
+        final boolean sectionExists = Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                "SELECT count(*) FROM section WHERE id = ?",
+                toArray(sectionId),
+                Integer.class
+            )
+        ) > 0;
+        if (!sectionExists) {
+            throw new NoSuchElementException(String.format("section with id %s does not exist", sectionId));
+        }
     }
 
     @Override
@@ -54,7 +75,10 @@ public class SimpleItemRepository implements ItemRepository {
             price,
             sectionId
         );
-        associateFeatures(itemId, item.features());
+
+        if (!item.features().isEmpty()) {
+            associateFeatures(itemId, item.features());
+        }
 
         return new SimpleItem(
             itemId,
@@ -76,11 +100,26 @@ public class SimpleItemRepository implements ItemRepository {
     @Override
     public Item getItem(Integer itemId) {
         Validate.notNull(itemId, "item id cannot be null");
+        validateItemExists(itemId);
         return jdbcTemplate.queryForObject(
             "SELECT * FROM item WHERE id = ?",
             itemRowMapper,
             itemId
         );
+    }
+
+    private void validateItemExists(Integer itemId) {
+        final boolean itemExists = Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                "SELECT count(*) FROM item WHERE id = ?",
+                toArray(itemId),
+                Integer.class
+            )
+        ) > 0;
+
+        if (!itemExists) {
+            throw new NoSuchElementException("item id does not exist");
+        }
     }
 
     @Override
@@ -115,9 +154,30 @@ public class SimpleItemRepository implements ItemRepository {
     public void associateFeatures(Integer itemId, Set<Feature> features) {
         Validate.notNull(itemId);
         Validate.notEmpty(features, "features cannot be empty");
+        validateFeaturesExists(features);
+
         for (Feature feature : features) {
             final Integer featureId = featureRepository.id(feature).orElseThrow();
             insertRowFor(itemId, featureId);
+        }
+    }
+
+    private void validateFeaturesExists(Set<Feature> features) {
+        for (Feature feature : features) {
+            String featureName = feature.name();
+            final boolean featuresExists = Objects.requireNonNull(
+                jdbcTemplate.queryForObject(
+                    "SELECT count(*) FROM feature WHERE name = ?",
+                    toArray(featureName),
+                    Integer.class
+                )
+            ) > 0;
+
+            if (!featuresExists) {
+                throw new NoSuchElementException(
+                    String.format("feature with feature name %s does not exist", featureName)
+                );
+            }
         }
     }
 

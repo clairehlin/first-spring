@@ -23,6 +23,7 @@ public class SimpleFeatureService implements FeatureService {
 
     @Override
     public void create(Feature feature) {
+        Validate.notNull(feature);
         featureRepository.create(feature);
     }
 

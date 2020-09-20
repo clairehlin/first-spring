@@ -32,7 +32,7 @@ class SimpleFeatureRepositoryTest {
         assertThat(features)
             .hasSize(3)
             .isNotEmpty()
-            .extracting(feature -> feature.name())
+            .extracting(Feature::name)
             .containsExactlyInAnyOrder("Keto", "Vegetarian", "Low Fat");
     }
 
@@ -57,7 +57,7 @@ class SimpleFeatureRepositoryTest {
         final Set<Feature> features =simpleFeatureRepository.list();
         assertThat(features)
             .hasSize(4)
-            .extracting(feature -> feature.name())
+            .extracting(Feature::name)
             .containsExactlyInAnyOrder("Keto", "Vegetarian", "Spicy Food", "Low Fat");
     }
 

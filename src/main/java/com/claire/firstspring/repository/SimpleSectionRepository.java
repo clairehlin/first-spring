@@ -2,11 +2,14 @@ package com.claire.firstspring.repository;
 
 import com.claire.firstspring.model.Section;
 import com.claire.firstspring.model.SimpleSection;
+import org.apache.commons.lang3.Validate;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Collections.emptyList;
@@ -29,13 +32,14 @@ public class SimpleSectionRepository implements SectionRepository {
     @Override
     public List<Section> sections() {
         return jdbcTemplate.query(
-            "SELECT * FROM sections LIMIT 101",
+            "SELECT * FROM section LIMIT 101",
             sectionRowMapper
         );
     }
 
     @Override
     public Optional<Section> section(Integer id) {
+        validateSectionExists(id);
         Section section = jdbcTemplate.queryForObject(
             "SELECT * FROM section WHERE id = ?",
             toArray(id),
@@ -46,21 +50,35 @@ public class SimpleSectionRepository implements SectionRepository {
 
     @Override
     public List<Section> menuSections(Integer menuId) {
+        Validate.notNull(menuId, "menu id cannot be null");
+        validateMenuExists(menuId);
         return jdbcTemplate.query(
             "SELECT * FROM section WHERE menu_id = ?",
             toArray(menuId),
             sectionRowMapper
         );
-
     }
 
     @Override
     public Section create(Integer menuId, String sectionName) {
+        Validate.notNull(menuId);
+        Validate.notNull(sectionName, "section name cannot be null");
+        Validate.notEmpty(sectionName, "section name cannot be empty");
+        validateMenuExists(menuId);
+
+
         final int sectionId = idGeneratingRepository.nextId(this);
 
-        jdbcTemplate.update(
+        final int updated = jdbcTemplate.update(
             "INSERT INTO section (id, name, menu_id) VALUES (?, ?, ?)",
             sectionId,
+            sectionName,
+            menuId
+        );
+
+        Validate.isTrue(
+            updated > 0,
+            "failed to create a section with name %s for menu with id %s",
             sectionName,
             menuId
         );
@@ -74,6 +92,8 @@ public class SimpleSectionRepository implements SectionRepository {
 
     @Override
     public void deleteSection(Integer sectionId) {
+        Validate.notNull(sectionId);
+
         final int deleted = jdbcTemplate.update(
             "DELETE FROM section WHERE id = ?",
             sectionId
@@ -86,6 +106,7 @@ public class SimpleSectionRepository implements SectionRepository {
 
     @Override
     public void updateSectionName(Integer id, String name) {
+        Validate.notNull(name);
         final int updated = jdbcTemplate.update(
             "UPDATE section SET name = ? WHERE id = ?",
             name,
@@ -102,5 +123,35 @@ public class SimpleSectionRepository implements SectionRepository {
     @Override
     public String getMainTableName() {
         return "section";
+    }
+
+    private void validateMenuExists(Integer menuId) {
+        final boolean menuExists = Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                "SELECT count(*) FROM menu WHERE id = ?",
+                toArray(menuId),
+                Integer.class
+            )
+        ) > 0;
+
+        if (!menuExists) {
+            throw new NoSuchElementException(String.format(
+                "menu id %s does not exist",
+                menuId));
+        }
+    }
+
+    private void validateSectionExists(Integer sectionId) {
+        final boolean sectionExists = Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+            "SELECT count(*) FROM section WHERE id = ?",
+            toArray(sectionId),
+            Integer.class
+            )
+        ) > 0;
+
+        if (!sectionExists) {
+            throw new NoSuchElementException(String.format("section id %s does not exist", sectionId));
+        }
     }
 }
