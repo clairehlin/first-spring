@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.claire.firstspring.web.model.FeatureUpdate.featureUpdate;
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FeatureResourceTest {
@@ -32,9 +33,30 @@ class FeatureResourceTest {
         }
 
         @Test
-        @Sql(statements = {"DELETE FROM item_feature", "DELETE FROM feature"})
-        void can_list_features_when_there_is_none() {
+        @Sql(statements = {
+            "DELETE FROM item_feature",
+            "DELETE FROM feature"
+        })
+        void can_list_features_when_there_is_none() throws Exception {
+            // when
+            final Set<String> features = get("/features", 200, STRING_SET_TYPE_REFERENCE);
 
+            // then
+            assertThat(features).isEmpty();
+        }
+
+        @Test
+        @Sql(statements = {
+            "DELETE FROM item_feature",
+            "DELETE FROM feature",
+            "INSERT INTO feature (id, name) VALUES (1, 'spicy')"
+        })
+        void can_list_features_when_there_is_one() throws Exception {
+            // when
+            final Set<String> features = get("/features", 200, STRING_SET_TYPE_REFERENCE);
+
+            // then
+            assertThat(features).contains("spicy");
         }
     }
 
@@ -43,7 +65,7 @@ class FeatureResourceTest {
     class Deleting extends AbstractResourceTest {
         @Test
         @Sql(statements = "INSERT INTO feature (id, name) VALUES (100, 'feature to delete');")
-        void can_delete_features() throws Exception {
+        void can_delete_a_feature_by_name() throws Exception {
             // given
             final Set<String> featuresBefore = get("/features", 200, STRING_SET_TYPE_REFERENCE);
             assertThat(featuresBefore).contains("feature to delete");
@@ -55,6 +77,28 @@ class FeatureResourceTest {
             final Set<String> featuresAfter = get("/features", 200, STRING_SET_TYPE_REFERENCE);
             assertThat(featuresAfter)
                 .doesNotContain("feature to delete");
+        }
+
+        @Test
+        void cannot_delete_a_non_existing_feature() throws Exception {
+            // given
+            final Set<String> featuresBefore = get("/features", 200, STRING_SET_TYPE_REFERENCE);
+            assertThat(featuresBefore)
+                .containsExactlyInAnyOrder("Keto", "Vegetarian", "Low Fat");
+
+            // when
+            delete("/features/Spicy", 404);
+        }
+
+        @Test
+        void cannot_delete_an_empty_feature() throws Exception {
+            // given
+            final Set<String> featuresBefore = get("/features", 200, STRING_SET_TYPE_REFERENCE);
+            assertThat(featuresBefore)
+                .containsExactlyInAnyOrder("Keto", "Vegetarian", "Low Fat");
+
+            // when
+            delete("/features/ ", 400);
         }
     }
 
@@ -73,7 +117,17 @@ class FeatureResourceTest {
             // then
             final Set<String> featuresAfter = get("/features", 200, STRING_SET_TYPE_REFERENCE);
             assertThat(featuresAfter).contains("Gluten Free");
+        }
 
+        @Test
+        void fails_to_create_an_empty_feature_name() throws Exception {
+            // given
+            final Set<String> featuresBefore = get("/features", 200, STRING_SET_TYPE_REFERENCE);
+            assertThat(featuresBefore).containsExactlyInAnyOrder("Keto", "Vegetarian", "Low Fat");
+
+            // when/then
+            put("/features/" + "", 400);
+            put("/features/" + " ", 400);
         }
     }
 
@@ -112,6 +166,58 @@ class FeatureResourceTest {
         }
 
         @Test
+        void can_update_a_list_of_features_with_multiple_features() throws Exception {
+            // given
+            final Set<String> featuresBefore = get("/features", 200, STRING_SET_TYPE_REFERENCE);
+            assertThat(featuresBefore).containsExactlyInAnyOrder("Keto", "Vegetarian", "Low Fat");
+
+            // when
+            FeatureUpdate featureUpdate1 = featureUpdate("Keto", "Gluten Free");
+            FeatureUpdate featureUpdate2 = featureUpdate("Vegetarian", "Spicy");
+            List<FeatureUpdate> featureUpdates = List.of(featureUpdate1, featureUpdate2);
+
+            put("/features", 200, featureUpdates);
+
+            // then
+            final Set<String> featuresAfter = get("/features", 200, STRING_SET_TYPE_REFERENCE);
+            assertThat(featuresAfter).containsExactlyInAnyOrder("Gluten Free", "Spicy", "Low Fat");
+        }
+
+        @Test
+        void can_update_a_list_of_features_with_no_features() throws Exception {
+            // given
+            final Set<String> featuresBefore = get("/features", 200, STRING_SET_TYPE_REFERENCE);
+            assertThat(featuresBefore).containsExactlyInAnyOrder("Keto", "Vegetarian", "Low Fat");
+
+            // when
+            List<FeatureUpdate> featureUpdates = emptyList();
+
+            put("/features", 200, featureUpdates);
+
+            // then
+            final Set<String> featuresAfter = get("/features", 200, STRING_SET_TYPE_REFERENCE);
+            assertThat(featuresAfter).containsExactlyInAnyOrder("Keto", "Vegetarian", "Low Fat");
+        }
+
+        @Test
+        void can_update_a_list_of_features_with_valid_names_excluding_invalid_new_name() throws Exception {
+            // given
+            final Set<String> featuresBefore = get("/features", 200, STRING_SET_TYPE_REFERENCE);
+            assertThat(featuresBefore).containsExactlyInAnyOrder("Keto", "Vegetarian", "Low Fat");
+
+            // when
+            FeatureUpdate featureUpdate1 = featureUpdate("Keto", "Gluten Free");
+            FeatureUpdate featureUpdate2 = featureUpdate("Vegetarian", " ");
+            List<FeatureUpdate> featureUpdates = List.of(featureUpdate1, featureUpdate2);
+
+            put("/features", 400, featureUpdates);
+
+            // then
+            final Set<String> featuresAfter = get("/features", 200, STRING_SET_TYPE_REFERENCE);
+            assertThat(featuresAfter).containsExactlyInAnyOrder("Gluten Free", "Vegetarian", "Low Fat");
+        }
+
+        @Test
         void fails_to_update_non_existing_features() throws Exception {
             // given
             final Set<String> featuresBefore = get("/features", 200, STRING_SET_TYPE_REFERENCE);
@@ -122,6 +228,16 @@ class FeatureResourceTest {
 
             // when/then
             put("/features", 404, featureUpdates);
+        }
+
+        @Test
+        void cannot_update_a_feature_with_empty_feature_name() throws Exception {
+            // given
+            final Set<String> featuresBefore = get("/features", 200, STRING_SET_TYPE_REFERENCE);
+            assertThat(featuresBefore).containsExactlyInAnyOrder("Keto", "Vegetarian", "Low Fat");
+
+            // when/then
+            put("/features/" + "Low Fat/name/ ", 400);
         }
     }
 }
