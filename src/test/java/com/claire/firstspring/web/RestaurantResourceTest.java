@@ -1,5 +1,7 @@
 package com.claire.firstspring.web;
 
+import com.claire.firstspring.mappers.FeatureMapper;
+import com.claire.firstspring.mappers.ItemMapper;
 import com.claire.firstspring.mappers.MenuMapper;
 import com.claire.firstspring.mappers.SectionMapper;
 import com.claire.firstspring.model.Menu;
@@ -25,8 +27,10 @@ class RestaurantResourceTest {
         );
         RestaurantService restaurantService = new TestRestaurantService(expectedRestaurants);
         MenuService menuService = new TestMenuService();
-        MenuMapper menuMapper = new MenuMapper();
-        SectionMapper sectionMapper = new SectionMapper();
+        FeatureMapper featureMapper = new FeatureMapper();
+        ItemMapper itemMapper = new ItemMapper(featureMapper);
+        SectionMapper sectionMapper = new SectionMapper(itemMapper);
+        MenuMapper menuMapper = new MenuMapper(sectionMapper);
 
         //when
 

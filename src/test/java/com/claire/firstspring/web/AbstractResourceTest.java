@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Callable;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,42 +30,50 @@ public abstract class AbstractResourceTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    protected <T> T get(String uri, int status, Class<T> tClass) throws Exception {
-        return objectMapper.readValue(get(uri, status), tClass);
+    protected <T> T get(String uri, int status, Class<T> tClass) {
+        return propagate(() -> objectMapper.readValue(get(uri, status), tClass));
     }
 
-    protected <T> T get(String uri, int status, TypeReference<T> collectionTypeReference) throws Exception {
-        return objectMapper.readValue(get(uri, status), collectionTypeReference);
+    protected <T> T get(String uri, int status, TypeReference<T> collectionTypeReference) {
+        return propagate(() -> objectMapper.readValue(get(uri, status), collectionTypeReference));
     }
 
-    protected <T> void put(String uri, int status, T t) throws Exception {
-        final String body = objectMapper.writeValueAsString(t);
-        final MockHttpServletRequestBuilder requestBuilder = put(uri)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(body);
-        mockMvc.perform(requestBuilder)
-            .andExpect(status().is(status))
-            .andDo(debugHandler());
+    protected <T> void put(String uri, int status, T t) {
+        propagate(() -> {
+            final String body = objectMapper.writeValueAsString(t);
+            final MockHttpServletRequestBuilder requestBuilder = put(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body);
+            mockMvc.perform(requestBuilder)
+                .andExpect(status().is(status))
+                .andDo(debugHandler());
+        });
     }
 
-    private byte[] get(String uri, int status) throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get(uri))
-            .andExpect(status().is(status))
-            .andDo(debugHandler())
-            .andReturn();
+    private byte[] get(String uri, int status) {
+        MvcResult mvcResult = propagate(
+            () -> mockMvc.perform(get(uri))
+                .andExpect(status().is(status))
+                .andDo(debugHandler())
+                .andReturn()
+        );
         return mvcResult.getResponse().getContentAsByteArray();
     }
 
-    protected void delete(String uri, int status) throws Exception {
-        mockMvc.perform(delete(uri))
-            .andExpect(status().is(status))
-            .andDo(debugHandler());
+    protected void delete(String uri, int status) {
+        propagate(
+            () -> mockMvc.perform(delete(uri))
+                .andExpect(status().is(status))
+                .andDo(debugHandler())
+        );
     }
 
-    protected void put(String uri, int status) throws Exception {
-        mockMvc.perform(put(uri))
-            .andExpect(status().is(status))
-            .andDo(debugHandler());
+    protected void put(String uri, int status) {
+        propagate(
+            () -> mockMvc.perform(put(uri))
+                .andExpect(status().is(status))
+                .andDo(debugHandler())
+        );
     }
 
     private ResultHandler debugHandler() {
@@ -102,5 +111,25 @@ public abstract class AbstractResourceTest {
 
     private MockHttpServletRequestBuilder put(String uri, String body) {
         return MockMvcRequestBuilders.put(uri).content(body);
+    }
+
+    private <T> T propagate(Callable<T> callable) {
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            throw new RuntimeException("failed executing callable", e);
+        }
+    }
+
+    private void propagate(ThrowingRunnable runnable) {
+        try {
+            runnable.run();
+        } catch (Exception e) {
+            throw new RuntimeException("failed executing runnable", e);
+        }
+    }
+
+    private interface ThrowingRunnable {
+        void run() throws Exception;
     }
 }

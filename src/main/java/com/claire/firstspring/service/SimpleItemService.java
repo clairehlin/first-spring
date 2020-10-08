@@ -73,6 +73,8 @@ public class SimpleItemService implements ItemService {
 
     @Override
     public void updateItem(Item item) {
+        itemRepository.validateItemExists(item.id());
+
         final Set<Feature> features = featureRepository.itemFeatures(item.id());
 
         final Set<Feature> removedFeatures = removedFeatures(features, item.features());

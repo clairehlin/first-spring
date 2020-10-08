@@ -2,11 +2,11 @@ package com.claire.firstspring.web;
 
 import com.claire.firstspring.mappers.FeatureMapper;
 import com.claire.firstspring.mappers.ItemMapper;
-import com.claire.firstspring.model.Feature;
 import com.claire.firstspring.model.Item;
 import com.claire.firstspring.model.SimpleItem;
 import com.claire.firstspring.service.ItemService;
 import com.claire.firstspring.web.model.WebItem;
+import org.apache.commons.lang3.Validate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,23 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
-/**
- * get all - done
- * get one - done
- * update multiple - done
- * update one - done
- * delete one - done
- * delete multiple - done
- * create one item- exists in section resource
- * create multiple items - exists in section resource
- */
 @RestController
 @RequestMapping("/items")
 public class ItemResource {
@@ -76,6 +64,8 @@ public class ItemResource {
 
     @PutMapping("/{item-id}")
     public void updateItem(@PathVariable("item-id") Integer itemId, @RequestBody WebItem webItem) {
+        failIfIdsInconsistent(itemId, webItem);
+
         Item item = new SimpleItem(
             itemId,
             webItem.name,
@@ -84,6 +74,15 @@ public class ItemResource {
             featureMapper.toFirsts(webItem.features)
         );
         itemService.updateItem(item);
+    }
+
+    private void failIfIdsInconsistent(Integer itemId, WebItem webItem) {
+        Validate.isTrue(
+            Objects.equals(itemId, webItem.id),
+            "web item id in body [%s] must be the same as item id [%s] in URI",
+            webItem.id,
+            itemId
+        );
     }
 
     @PutMapping

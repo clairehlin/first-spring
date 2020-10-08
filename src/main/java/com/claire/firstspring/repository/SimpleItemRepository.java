@@ -99,7 +99,7 @@ public class SimpleItemRepository implements ItemRepository {
 
     @Override
     public Item getItem(Integer itemId) {
-        Validate.notNull(itemId, "item id cannot be null");
+        Validate.notNull(itemId, "client-error: item id cannot be null");
         validateItemExists(itemId);
         return jdbcTemplate.queryForObject(
             "SELECT * FROM item WHERE id = ?",
@@ -108,7 +108,8 @@ public class SimpleItemRepository implements ItemRepository {
         );
     }
 
-    private void validateItemExists(Integer itemId) {
+    @Override
+    public void validateItemExists(Integer itemId) {
         final boolean itemExists = Objects.requireNonNull(
             jdbcTemplate.queryForObject(
                 "SELECT count(*) FROM item WHERE id = ?",
@@ -155,6 +156,7 @@ public class SimpleItemRepository implements ItemRepository {
         Validate.notNull(itemId);
         Validate.notEmpty(features, "features cannot be empty");
         validateFeaturesExists(features);
+        validateItemExists(itemId);
 
         for (Feature feature : features) {
             final Integer featureId = featureRepository.id(feature).orElseThrow();
@@ -185,6 +187,7 @@ public class SimpleItemRepository implements ItemRepository {
     public void disassociateFeatures(Integer itemId, Set<Feature> features) {
         Validate.notNull(itemId);
         Validate.notEmpty(features, "features cannot be empty");
+        validateItemExists(itemId);
         for (Feature feature : features) {
             final Integer featureId = featureRepository.id(feature).orElseThrow();
             removeRowFor(itemId, featureId);

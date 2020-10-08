@@ -6,7 +6,7 @@ import com.claire.firstspring.model.Item;
 import java.util.List;
 import java.util.Set;
 
-public interface ItemRepository extends MainTableAwareRepository{
+public interface ItemRepository extends MainTableAwareRepository {
     List<Item> sectionItems(Integer id);
 
     Item create(Integer sectionId, Item item);
@@ -22,4 +22,6 @@ public interface ItemRepository extends MainTableAwareRepository{
     void associateFeatures(Integer itemId, Set<Feature> features);
 
     void disassociateFeatures(Integer itemId, Set<Feature> features);
+
+    void validateItemExists(Integer itemId);
 }
