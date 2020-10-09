@@ -104,11 +104,11 @@ class ItemResourceTest {
 
             put("/items/4", 200, webItemNew);
 
-            // then
-//            final WebItem webItemAfter = get("/items/4", 200, WebItem.class);
-//            assertThat(webItemAfter.name).contains("high protein beef soup");
-//            assertThat(webItemAfter.description).contains("high protein beef bone soup with vegetables");
-//            assertThat(webItemAfter.price).isEqualTo(webItemNew.price);
+//             then
+            final WebItem webItemAfter = get("/items/4", 200, WebItem.class);
+            assertThat(webItemAfter.name).contains("high protein beef soup");
+            assertThat(webItemAfter.description).contains("high protein beef bone soup with vegetables");
+            assertThat(webItemAfter.price).isEqualTo(webItemNew.price);
         }
 
         @Test
