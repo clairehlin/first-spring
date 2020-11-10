@@ -92,12 +92,7 @@ public class SectionResource {
 
     @PostMapping("/{section-id}/items")
     public void createItems(@PathVariable("section-id") Integer sectionId, @RequestBody List<WebItem> webItems) {
-        webItems.forEach(createItem(sectionId));
-    }
-
-    @PostMapping("/{section-id}/item")
-    public void createItem(@PathVariable("section-id") Integer sectionId, @RequestBody WebItem webItem) {
-        createItem(sectionId);
+        webItems.forEach(webItem -> createItem(sectionId, webItem));
     }
 
     @DeleteMapping("/{section-id}")
@@ -110,16 +105,16 @@ public class SectionResource {
         sectionIds.forEach(sectionService::deleteSection);
     }
 
-    private Consumer<WebItem> createItem(Integer sectionId) {
-        return webItem -> {
+    private void createItem(Integer sectionId, WebItem webItem) {
+
             Item item = new SimpleItem(
-                sectionId,
+                null,
                 webItem.name,
                 webItem.description,
                 webItem.price,
                 featureMapper.toFirsts(webItem.features)
             );
             itemService.addNewItemToSection(sectionId, item);
-        };
+
     }
 }

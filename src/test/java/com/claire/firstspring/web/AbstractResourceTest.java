@@ -13,9 +13,9 @@ import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -42,6 +42,18 @@ public abstract class AbstractResourceTest {
         propagate(() -> {
             final String body = objectMapper.writeValueAsString(t);
             final MockHttpServletRequestBuilder requestBuilder = put(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body);
+            mockMvc.perform(requestBuilder)
+                .andExpect(status().is(status))
+                .andDo(debugHandler());
+        });
+    }
+
+    protected <T> void post(String uri, int status, T t) {
+        propagate(() -> {
+            final String body = objectMapper.writeValueAsString(t);
+            final MockHttpServletRequestBuilder requestBuilder = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body);
             mockMvc.perform(requestBuilder)
@@ -92,7 +104,7 @@ public abstract class AbstractResourceTest {
             "printing body: " +
                 new String(
                     result.getResponse().getContentAsByteArray(),
-                    StandardCharsets.UTF_8
+                    UTF_8
                 )
         );
     }
@@ -111,6 +123,10 @@ public abstract class AbstractResourceTest {
 
     private MockHttpServletRequestBuilder put(String uri, String body) {
         return MockMvcRequestBuilders.put(uri).content(body);
+    }
+
+    private MockHttpServletRequestBuilder post(String uri) {
+        return MockMvcRequestBuilders.post(uri);
     }
 
     private <T> T propagate(Callable<T> callable) {

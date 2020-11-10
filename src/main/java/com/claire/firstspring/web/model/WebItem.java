@@ -10,6 +10,17 @@ public class WebItem {
     public double price;
     public Set<String> features;
 
+    public static WebItem of(Integer id, String name, String description, double price, Set<String> features) {
+        WebItem webItem = new WebItem();
+        webItem.id = id;
+        webItem.name = name;
+        webItem.description = description;
+        webItem.price = price;
+        webItem.features = features;
+
+        return webItem;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -1,6 +1,7 @@
 package com.claire.firstspring.mappers;
 
 import com.claire.firstspring.model.Item;
+import com.claire.firstspring.model.SimpleItem;
 import com.claire.firstspring.web.model.WebItem;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,15 @@ public class ItemMapper implements Mapper<Item, WebItem> {
 
     @Override
     public Item toFirst(WebItem webItem) {
-        throw new UnsupportedOperationException("Have not yet implemented WebItem to Item mapping.");
+
+        return new SimpleItem(
+            webItem.id,
+            webItem.name,
+            webItem.description,
+            webItem.price,
+            featureMapper.toFirsts(webItem.features)
+        );
+
     }
 
     @Override

@@ -12,10 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.collections4.SetUtils.hashSet;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -169,7 +166,7 @@ class ItemResourceTest {
         }
 
         @Test
-        void fails_to_update_when_id_in_uri_is_different_from_body () {
+        void fails_to_update_when_id_in_uri_is_different_from_body() {
             // given
             WebItem webItem = get("/items/2", 200, WebItem.class);
 
@@ -202,9 +199,59 @@ class ItemResourceTest {
 
             // when
             put("/items", 404, webItemList);
-
-
         }
     }
+
+    @Nested
+    @Transactional
+    class Deletion extends AbstractResourceTest {
+        @Test
+        @Sql(statements =
+            "INSERT INTO item (id, name, description, price, section_id) VALUES (100, 'sweet corn soup', 'soup', 10.99, 1)"
+        )
+        void can_delete_an_item() {
+            // given
+            final WebItem webItem = get("/items/100", 200, WebItem.class);
+
+            // when
+            delete("/items/100", 200);
+
+            // then
+            List<WebItem> webItemListAfter = get("/items", 200, WEB_ITEM_LIST_TYPE_REFERENCE);
+            assertThat(webItemListAfter).doesNotContain(webItem);
+        }
+
+        @Test
+        @Sql(statements =
+            {"INSERT INTO item (id, name, description, price, section_id) VALUES (100, 'sweet corn soup', 'soup', 10.99, 1)",
+                "INSERT INTO item (id, name, description, price, section_id) VALUES (200, 'spicy beef', 'meat', 20.99, 2)"
+            }
+        )
+        void can_delete_a_list_of_items() {
+            // given
+            List<WebItem> webItemList = get("/items", 200, WEB_ITEM_LIST_TYPE_REFERENCE);
+
+            // when
+            delete("/items?ids=100,200", 200);
+
+            // then
+            List<WebItem> webItemListAfter = get("/items", 200, WEB_ITEM_LIST_TYPE_REFERENCE);
+            assertThat(webItemListAfter.stream().map(webItem -> webItem.id)).doesNotContain(100, 200);
+        }
+
+        @Test
+        void fails_to_delete_a_non_existing_item() {
+            // when/then
+            delete("/items/100", 404);
+        }
+
+        @Test
+        void fails_to_delete_a_list_of_non_existing_items() {
+            // when/then
+            delete("/items?ids=100,200", 404);
+        }
+    }
+
+
 }
 

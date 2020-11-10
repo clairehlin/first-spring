@@ -101,10 +101,10 @@ class SimpleItemRepositoryTest {
         }
 
         @Test
-        void fail_if_item_it_is_missing() {
+        void fail_get_an_item_if_item_id_is_missing() {
             assertThatCode(() -> simpleItemRepository.getItem(null))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessage("item id cannot be null");
+                .hasMessage("client-error: item id cannot be null");
         }
 
         @Test

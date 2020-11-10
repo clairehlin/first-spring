@@ -1,5 +1,6 @@
 package com.claire.firstspring.web;
 
+import com.claire.firstspring.web.model.WebError;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpStatus;
@@ -16,31 +17,40 @@ public class ResourceExceptionHandler {
         IllegalArgumentException.class,
         IllegalStateException.class
     })
-    protected ResponseEntity<Object> badRequest(RuntimeException ex) {
+    protected ResponseEntity<WebError> badRequest(RuntimeException ex) {
         String bodyOfResponse = ExceptionUtils.getStackTrace(ex);
-        return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(WebError.of(bodyOfResponse), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({NullPointerException.class})
-    protected ResponseEntity<Object> nullPointerException(NullPointerException ex) {
+    protected ResponseEntity<WebError> nullPointerException(NullPointerException ex) {
         String message = ex.getMessage();
         if (StringUtils.startsWith(message, "client-error:")) {
             return badRequest(ex);
         } else {
             String bodyOfResponse = ExceptionUtils.getStackTrace(ex);
-            return new ResponseEntity<>(bodyOfResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(
+                WebError.of(bodyOfResponse),
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
     @ExceptionHandler({NoSuchElementException.class})
-    protected ResponseEntity<String> notFound(NoSuchElementException ex) {
+    protected ResponseEntity<WebError> notFound(NoSuchElementException ex) {
         String bodyOfResponse = ExceptionUtils.getStackTrace(ex);
-        return new ResponseEntity<>(bodyOfResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(
+            WebError.of(bodyOfResponse),
+            HttpStatus.NOT_FOUND
+        );
     }
 
     @ExceptionHandler({RuntimeException.class})
-    protected ResponseEntity<String> runTimeException(RuntimeException ex) {
+    protected ResponseEntity<WebError> runTimeException(RuntimeException ex) {
         String bodyOfResponse = ExceptionUtils.getStackTrace(ex);
-        return new ResponseEntity<>(bodyOfResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(
+            WebError.of(bodyOfResponse),
+            HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 }

@@ -308,7 +308,7 @@ class SimpleItemServiceTest {
 
             // when/then
             assertThatCode(() -> simpleItemService.updateItem(item))
-            .isInstanceOf(NullPointerException.class);
+            .isInstanceOf(NoSuchElementException.class);
         }
 
         @Test
@@ -325,7 +325,7 @@ class SimpleItemServiceTest {
             // when/then
             assertThatCode(() -> simpleItemService.updateItem(item))
             .isInstanceOf(NoSuchElementException.class)
-            .hasMessageContaining("item does not exist");
+            .hasMessageContaining("item id does not exist");
         }
     }
 }   
