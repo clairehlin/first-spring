@@ -17,8 +17,6 @@ class SectionResourceTest {
     public static final TypeReference<List<WebSection>> WEB_SECTION_LIST_TYPE_REFERENCE = new TypeReference<>() {
     };
 
-    // can delete a list of sections
-
     @Nested
     @Transactional
     class Listing extends AbstractResourceTest {
