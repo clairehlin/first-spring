@@ -28,12 +28,16 @@ public class ResourceExceptionHandler {
         if (StringUtils.startsWith(message, "client-error:")) {
             return badRequest(ex);
         } else {
-            String bodyOfResponse = ExceptionUtils.getStackTrace(ex);
-            return new ResponseEntity<>(
-                WebError.of(bodyOfResponse),
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            return internalServerError(ex);
         }
+    }
+
+    private ResponseEntity<WebError> internalServerError(NullPointerException ex) {
+        String bodyOfResponse = ExceptionUtils.getStackTrace(ex);
+        return new ResponseEntity<>(
+            WebError.of(bodyOfResponse),
+            HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 
     @ExceptionHandler({NoSuchElementException.class})

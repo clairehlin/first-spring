@@ -92,20 +92,19 @@ class ItemResourceTest {
             assertThat(webItem.name).contains("low calories salad");
 
             // when
-            WebItem webItemNew = new WebItem();
-            webItemNew.id = webItem.id;
-            webItemNew.price = 23.99;
-            webItemNew.name = "high protein beef soup";
-            webItemNew.description = "high protein beef bone soup with vegetables";
-            webItemNew.features = hashSet("Keto");
+            webItem.id = webItem.id;
+            webItem.price = 23.99;
+            webItem.name = "high protein beef soup";
+            webItem.description = "high protein beef bone soup with vegetables";
+            webItem.features = hashSet("Keto");
 
-            put("/items/4", 200, webItemNew);
+            put("/items/4", 200, webItem);
 
 //             then
             final WebItem webItemAfter = get("/items/4", 200, WebItem.class);
             assertThat(webItemAfter.name).contains("high protein beef soup");
             assertThat(webItemAfter.description).contains("high protein beef bone soup with vegetables");
-            assertThat(webItemAfter.price).isEqualTo(webItemNew.price);
+            assertThat(webItemAfter.price).isEqualTo(webItem.price);
         }
 
         @Test

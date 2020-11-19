@@ -22,4 +22,13 @@ public class WebSection {
     public int hashCode() {
         return Objects.hash(id, name, items);
     }
+
+    public static WebSection of(Integer id, String name, List<WebItem> items) {
+        WebSection webSection = new WebSection();
+        webSection.id = id;
+        webSection.name = name;
+        webSection.items = items;
+
+        return webSection;
+    }
 }

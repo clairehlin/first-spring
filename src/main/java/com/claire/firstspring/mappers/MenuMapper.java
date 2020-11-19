@@ -20,6 +20,7 @@ public class MenuMapper implements Mapper<Menu, WebMenu> {
     @Override
     public WebMenu toSecond(Menu menu) {
         WebMenu webMenu = new WebMenu();
+        webMenu.id = menu.id();
         webMenu.name = menu.name();
         webMenu.sections = sectionMapper.toSeconds(menu.sections());
         return webMenu;

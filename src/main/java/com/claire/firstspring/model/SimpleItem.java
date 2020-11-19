@@ -1,7 +1,11 @@
 package com.claire.firstspring.model;
 
+import org.apache.commons.lang3.Validate;
+
 import java.util.Objects;
 import java.util.Set;
+
+import static org.apache.commons.collections4.SetUtils.emptyIfNull;
 
 public class SimpleItem implements Item {
 
@@ -12,11 +16,13 @@ public class SimpleItem implements Item {
     private final Set<Feature> features;
 
     public SimpleItem(Integer id, String name, String description, double price, Set<Feature> features) {
+        Validate.notBlank(description, "client-error: description cannot be blank");
+        Validate.notBlank(name, "client-error: name cannot be blank");
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
-        this.features = Set.copyOf(features);
+        this.features = Set.copyOf(emptyIfNull(features));
     }
 
     @Override
