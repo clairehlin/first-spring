@@ -1,0 +1,1 @@
+curl --verbose -X DELETE http://localhost:8080/features/$1

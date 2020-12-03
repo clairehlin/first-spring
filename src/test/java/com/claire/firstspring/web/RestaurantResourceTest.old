@@ -1,0 +1,129 @@
+package com.claire.firstspring.web;
+
+import com.claire.firstspring.mappers.FeatureMapper;
+import com.claire.firstspring.mappers.ItemMapper;
+import com.claire.firstspring.mappers.MenuMapper;
+import com.claire.firstspring.mappers.SectionMapper;
+import com.claire.firstspring.model.Menu;
+import com.claire.firstspring.model.Restaurant;
+import com.claire.firstspring.service.MenuService;
+import com.claire.firstspring.service.RestaurantService;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+
+class RestaurantResourceTest {
+
+    class Listing extends AbstractResourceTest {
+
+        @Test
+        void can_get_list_of_restaurants() {
+            //given
+            List<Restaurant> expectedRestaurants = asList(
+                new TestRestaurant(),
+                new TestRestaurant()
+            );
+            RestaurantService restaurantService = new TestRestaurantService(expectedRestaurants);
+            MenuService menuService = new TestMenuService();
+            FeatureMapper featureMapper = new FeatureMapper();
+            ItemMapper itemMapper = new ItemMapper(featureMapper);
+            SectionMapper sectionMapper = new SectionMapper(itemMapper);
+            MenuMapper menuMapper = new MenuMapper(sectionMapper);
+
+            //when
+
+            RestaurantResource restaurantResource = new RestaurantResource(restaurantService, menuService, sectionMapper, menuMapper);
+            final List<Restaurant> restaurants = restaurantResource.restaurants();
+
+            //then
+            assertThat(restaurants)
+                .hasSize(2)
+                .containsExactlyElementsOf(expectedRestaurants);
+        }
+    }
+
+
+
+    private static class TestRestaurant implements Restaurant {
+
+        @Override
+        public Integer id() {
+            return null;
+        }
+
+        @Override
+        public String name() {
+            return null;
+        }
+
+        @Override
+        public Set<Menu> menus() {
+            return null;
+        }
+    }
+
+    private static class TestRestaurantService implements RestaurantService {
+        private final List<Restaurant> expectedRestaurants;
+
+        public TestRestaurantService(List<Restaurant> expectedRestaurants) {
+            this.expectedRestaurants = expectedRestaurants;
+        }
+
+        @Override
+        public List<Restaurant> list() {
+            return expectedRestaurants;
+        }
+
+        @Override
+        public Restaurant get(Integer id) {
+            return null;
+        }
+
+        @Override
+        public Restaurant create(Restaurant restaurant) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void updateRestaurant(Restaurant restaurant) {
+
+        }
+
+        @Override
+        public void deleteRestaurant(Integer restaurantId) {
+
+        }
+    }
+
+    private static class TestMenuService implements MenuService {
+
+        @Override
+        public Menu addMenu(Integer restaurantId, Menu menu) {
+            return null;
+        }
+
+        @Override
+        public List<Menu> list() {
+            return null;
+        }
+
+        @Override
+        public Menu menu(Integer menuId) {
+            return null;
+        }
+
+        @Override
+        public void updateMenu(Menu menu) {
+
+        }
+
+        @Override
+        public void deleteMenu(Integer menuId) {
+
+        }
+    }
+}

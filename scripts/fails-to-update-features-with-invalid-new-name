@@ -1,0 +1,13 @@
+curl --verbose -X PUT http://localhost:8080/features \
+--header 'Content-Type: application/json' \
+--data-raw '
+[
+  {
+    "currentName": "Vegetarian",
+    "newName": "Veg"
+  },
+  {
+    "currentName": "Low Carb",
+    "newName": ""
+  }
+]'

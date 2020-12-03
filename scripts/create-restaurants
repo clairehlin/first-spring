@@ -1,5 +1,7 @@
 curl --verbose \
-    -X POST \
+    -X POST http://localhost:8080/restaurants 
     -H 'Content-Type: application/json' \
-    --data '{ "name":"restaurant a" }' \
-    http://localhost:8080/restaurants
+    --data-raw '[
+                 {"name":"taste the difference",
+                  "menus":" "}
+                ]'

@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashSet;
 import java.util.List;
 
-import static java.util.Collections.emptySet;
-
 /**
  * get one - done
  * get all - done
@@ -45,22 +43,32 @@ public class RestaurantResource {
     private final MenuService menuService;
     private final SectionMapper sectionMapper;
     private final MenuMapper menuMapper;
+    private final RestaurantMapper restaurantMapper;
 
-    public RestaurantResource(RestaurantService restaurantService, MenuService menuService, SectionMapper sectionMapper, MenuMapper menuMapper) {
+    public RestaurantResource(
+        RestaurantService restaurantService,
+        MenuService menuService,
+        SectionMapper sectionMapper,
+        MenuMapper menuMapper,
+        RestaurantMapper restaurantMapper)
+    {
         this.restaurantService = restaurantService;
         this.menuService = menuService;
         this.sectionMapper = sectionMapper;
         this.menuMapper = menuMapper;
+        this.restaurantMapper = restaurantMapper;
     }
 
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
-    public List<Restaurant> restaurants() {
-        return restaurantService.list();
+    @GetMapping
+    public List<WebRestaurant> restaurants() {
+        List<Restaurant> restaurantsList = restaurantService.list();
+        return restaurantMapper.toSeconds(restaurantsList);
     }
 
     @GetMapping("/{restaurant-id}")
-    public Restaurant restaurant(@PathVariable("restaurant-id") Integer restaurantId) {
-        return restaurantService.get(restaurantId);
+    public WebRestaurant restaurant(@PathVariable("restaurant-id") Integer restaurantId) {
+        Restaurant restaurant = restaurantService.get(restaurantId);
+        return restaurantMapper.toSecond(restaurant);
     }
 
     @PutMapping("/{restaurant-id}")
@@ -90,7 +98,7 @@ public class RestaurantResource {
     }
 
     @PostMapping
-    public void createRestaurants(@RequestParam List<WebRestaurant> webRestaurants) {
+    public void createRestaurants(@RequestBody List<WebRestaurant> webRestaurants) {
         webRestaurants.forEach(this::createRestaurant);
     }
 

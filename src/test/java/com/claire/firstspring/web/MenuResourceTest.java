@@ -343,6 +343,16 @@ class MenuResourceTest {
                 .contains("Thanksgiving Salad Section");
             assertThat(webMenuThanksgiving.sections).contains(salad_section);
         }
+
+        @Test
+        void fails_to_update_a_menu_with_non_existing_menu_id() {
+            // given
+            final WebMenu webMenu = get("/menus/1", 200, WebMenu.class);
+            webMenu.name = "Thanksgiving Menu";
+
+            // when
+            put("/menus/100", 404, webMenu);
+        }
     }
 
     @Nested

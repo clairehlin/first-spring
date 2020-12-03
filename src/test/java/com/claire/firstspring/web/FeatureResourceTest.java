@@ -119,15 +119,6 @@ class FeatureResourceTest {
             assertThat(featuresAfter).contains("Gluten Free");
         }
 
-        // TODO
-        @Test
-        void can_create_a_list_of_features() throws Exception {
-            // given
-            final Set<String> featuresBefore = get("/features", 200, STRING_SET_TYPE_REFERENCE);
-            assertThat(featuresBefore).containsExactlyInAnyOrder("Keto", "Vegetarian", "Low Fat");
-
-        }
-
         @Test
         void fails_to_create_an_empty_feature_name() throws Exception {
             // given
