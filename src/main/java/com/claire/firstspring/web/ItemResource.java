@@ -7,6 +7,7 @@ import com.claire.firstspring.model.SimpleItem;
 import com.claire.firstspring.service.ItemService;
 import com.claire.firstspring.web.model.WebItem;
 import org.apache.commons.lang3.Validate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/items")
+@Transactional
 public class ItemResource {
 
     private final ItemService itemService;

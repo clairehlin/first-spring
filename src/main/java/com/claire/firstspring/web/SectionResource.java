@@ -11,6 +11,7 @@ import com.claire.firstspring.service.ItemService;
 import com.claire.firstspring.service.SectionService;
 import com.claire.firstspring.web.model.WebItem;
 import com.claire.firstspring.web.model.WebSection;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,19 +27,9 @@ import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
 
-/**
- * get all - done
- * get one - done
- * update one - done
- * update multiple - done
- * delete one - done
- * create one - done
- * create multiple secions - done
- * create multiple items - done
- * create one item - done
- */
 @RestController
 @RequestMapping("/sections")
+@Transactional
 public class SectionResource {
 
     private final SectionService sectionService;

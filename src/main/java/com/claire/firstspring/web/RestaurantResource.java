@@ -11,6 +11,7 @@ import com.claire.firstspring.service.RestaurantService;
 import com.claire.firstspring.web.model.WebMenu;
 import com.claire.firstspring.web.model.WebRestaurant;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,19 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashSet;
 import java.util.List;
 
-/**
- * get one - done
- * get all - done
- * update one - done
- * update multiple - done
- * delete one - done
- * delete multiple - done
- * create one restaurant- done
- * create multiple restaurants - done
- */
-
 @RestController
 @RequestMapping("/restaurants")
+@Transactional
 public class RestaurantResource {
 
     private final RestaurantService restaurantService;

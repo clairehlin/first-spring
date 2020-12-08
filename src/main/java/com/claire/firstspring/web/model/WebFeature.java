@@ -1,4 +1,4 @@
-package com.claire.firstspring.web;
+package com.claire.firstspring.web.model;
 
 public class WebFeature {
     public Integer id;

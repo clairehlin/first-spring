@@ -4,6 +4,7 @@ import com.claire.firstspring.mappers.FeatureMapper;
 import com.claire.firstspring.model.Feature;
 import com.claire.firstspring.service.FeatureService;
 import com.claire.firstspring.web.model.FeatureUpdate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import static java.util.stream.Collectors.toSet;
 
 @RestController
 @RequestMapping("/features")
+@Transactional
 public class FeatureResource {
 
     private final FeatureService featureService;

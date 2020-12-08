@@ -1,7 +1,35 @@
-curl --verbose \
-    -X POST http://localhost:8080/restaurants 
-    -H 'Content-Type: application/json' \
-    --data-raw '[
-                 {"name":"taste the difference",
-                  "menus":" "}
-                ]'
+set -x
+
+curl --verbose 'http://localhost:8080/restaurants' -H 'Content-Type: application/json' \
+    --data-raw '
+[
+  {
+    "name": "SF Cafe",
+    "menus": [
+      {
+        "name": "Christmas Menu",
+        "sections": [
+          {
+            "name": "salad section",
+            "items": []
+          },
+          {
+            "name": "pasta section",
+            "items": [
+              {
+                "name": "chicken pasta",
+                "description": "grilled chicken with pasta and tomatoes",
+                "price": 23.99,
+                "features": [
+                   "Low Carb",
+                   "Veg"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
+'

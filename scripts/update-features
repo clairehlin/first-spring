@@ -3,8 +3,8 @@ curl --verbose -X PUT http://localhost:8080/features \
 --data-raw '
 [
   {
-    "currentName": "Veg",
-    "newName": "Vegetarian"
+    "currentName": "Vegetarian",
+    "newName": "Veg"
   },
   {
     "currentName": "Keto",

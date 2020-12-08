@@ -12,6 +12,7 @@ import com.claire.firstspring.service.SectionService;
 import com.claire.firstspring.web.model.WebMenu;
 import com.claire.firstspring.web.model.WebSection;
 import org.apache.commons.lang3.Validate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 @RestController
 @RequestMapping("/menus")
+@Transactional
 public class MenuResource {
 
     private final MenuService menuService;

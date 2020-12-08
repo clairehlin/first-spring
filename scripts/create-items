@@ -1,0 +1,15 @@
+curl --verbose -X POST http://localhost:8080/sections/1/items \
+--header 'Content-Type: application/json' \
+--data-raw '
+[
+  {
+    "name": "garlic shrimp",
+    "description": "shrimp in garlic sauce",
+    "price": "23.99",
+    "features":
+	[
+	  "Keto"
+	]
+  }
+]'
+
