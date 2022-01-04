@@ -22,3 +22,8 @@ jobs:
     # Runs a single command using the runners shell
     - name: Send greeting
       run: echo "Hello world!"
+      
+    - name: Run a multi-line script
+      run: 
+        echo is Java installed? 
+        java --version
