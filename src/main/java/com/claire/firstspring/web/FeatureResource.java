@@ -53,9 +53,4 @@ public class FeatureResource {
     public void deleteFeature(@PathVariable("feature-name") String featureName) {
         featureService.delete(featureName);
     }
-
-    @PostMapping
-    public void createFeature() {
-        
-    }
 }
