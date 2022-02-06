@@ -9,6 +9,7 @@ import com.claire.firstspring.repository.SimpleItemRepository;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
@@ -24,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.util.Lists.emptyList;
 
 @JdbcTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ComponentScan({"com.claire.firstspring.repository", "com.claire.firstspring.service"})
 @Import({PersistenceConfig.class})
 class SimpleSectionServiceTest {
@@ -35,6 +37,7 @@ class SimpleSectionServiceTest {
 
     @Nested
     @JdbcTest
+    @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
     @Import({PersistenceConfig.class})
     @Transactional
     class Listing {
@@ -75,6 +78,7 @@ class SimpleSectionServiceTest {
 
     @Nested
     @JdbcTest
+    @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
     @Import({PersistenceConfig.class})
     @Transactional
     class Creation {
@@ -163,6 +167,7 @@ class SimpleSectionServiceTest {
 
     @Nested
     @JdbcTest
+    @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
     @Import({PersistenceConfig.class})
     @Transactional
     class Updating {
@@ -203,6 +208,7 @@ class SimpleSectionServiceTest {
 
     @Nested
     @JdbcTest
+    @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
     @Import({PersistenceConfig.class})
     @Transactional
     class Deletion {

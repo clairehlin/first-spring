@@ -7,6 +7,7 @@ import com.claire.firstspring.model.SimpleRestaurant;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
@@ -22,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 @JdbcTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ComponentScan("com.claire.firstspring.repository")
 @Import({PersistenceConfig.class})
 class SimpleRestaurantRepositoryTest {
@@ -30,6 +32,7 @@ class SimpleRestaurantRepositoryTest {
 
     @Nested
     @JdbcTest
+    @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
     @Import({PersistenceConfig.class})
     @Transactional
     class Listing {
@@ -66,6 +69,7 @@ class SimpleRestaurantRepositoryTest {
 
     @Nested
     @JdbcTest
+    @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
     @Import({PersistenceConfig.class})
     @Transactional
     class Creation {
@@ -101,6 +105,7 @@ class SimpleRestaurantRepositoryTest {
 
     @Nested
     @JdbcTest
+    @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
     @Import({PersistenceConfig.class})
     @Transactional
     class Deletion {
@@ -132,6 +137,7 @@ class SimpleRestaurantRepositoryTest {
 
     @Nested
     @JdbcTest
+    @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
     @Import({PersistenceConfig.class})
     @Transactional
     class Updating {

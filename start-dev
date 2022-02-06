@@ -1,0 +1,1 @@
+java -jar -Dspring.profiles.active=dev ./target/first-spring-1.0-SNAPSHOT.jar

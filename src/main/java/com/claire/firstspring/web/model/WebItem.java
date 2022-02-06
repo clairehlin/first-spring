@@ -26,15 +26,29 @@ public class WebItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         WebItem webItem = (WebItem) o;
-        return Double.compare(webItem.price, price) == 0 &&
+        return isEqualDouble(webItem.price, price) &&
             Objects.equals(id, webItem.id) &&
             Objects.equals(name, webItem.name) &&
             Objects.equals(description, webItem.description) &&
             Objects.equals(features, webItem.features);
     }
 
+    private static boolean isEqualDouble(double v1, double v2) {
+        return Math.abs(v1 - v2) < .01;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, price, features);
+    }
+
+    @Override
+    public String toString() {
+        return "WebItem{id = " + this.id
+            + ", name = " + this.name
+            + ", description = " + this.description
+            + ", price = " + this.price
+            + ", features = " + this.features
+            + "}";
     }
 }
