@@ -1,1 +1,0 @@
-alter table menu add column
