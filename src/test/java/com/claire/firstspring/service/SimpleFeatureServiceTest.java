@@ -17,7 +17,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 @JdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ComponentScan({"com.claire.firstspring.repository", "com.claire.firstspring.service"})
+//@ComponentScan({"com.claire.firstspring.repository", "com.claire.firstspring.service"})
+@ComponentScan({"com.claire.firstspring.service", "com.claire.firstspring.repository"})
 @Import({PersistenceConfig.class})
 class SimpleFeatureServiceTest {
     @Autowired
@@ -26,7 +27,6 @@ class SimpleFeatureServiceTest {
     @Nested
     @JdbcTest
     @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-    @ComponentScan({"com.claire.firstspring.repository", "com.claire.firstspring.service"})
     @Import({PersistenceConfig.class})
     @Transactional
     class Listing {
@@ -50,7 +50,6 @@ class SimpleFeatureServiceTest {
     @Nested
     @JdbcTest
     @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-    @ComponentScan({"com.claire.firstspring.repository", "com.claire.firstspring.service"})
     @Import({PersistenceConfig.class})
     @Transactional
     class Creation {
@@ -76,7 +75,6 @@ class SimpleFeatureServiceTest {
     @Nested
     @JdbcTest
     @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-    @ComponentScan({"com.claire.firstspring.repository", "com.claire.firstspring.service"})
     @Import({PersistenceConfig.class})
     @Transactional
     class Updating {
@@ -126,7 +124,6 @@ class SimpleFeatureServiceTest {
     @Nested
     @JdbcTest
     @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-    @ComponentScan({"com.claire.firstspring.repository", "com.claire.firstspring.service"})
     @Import({PersistenceConfig.class})
     @Transactional
     @Sql(statements = "INSERT INTO feature (id, name) VALUES (5, 'feature to delete');")
