@@ -17,8 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 @JdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-//@ComponentScan({"com.claire.firstspring.repository", "com.claire.firstspring.service"})
-@ComponentScan({"com.claire.firstspring.service", "com.claire.firstspring.repository"})
+@ComponentScan({"com.claire.firstspring.repository", "com.claire.firstspring.service"})
 @Import({PersistenceConfig.class})
 class SimpleFeatureServiceTest {
     @Autowired
