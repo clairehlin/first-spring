@@ -10,17 +10,17 @@ on: [push]
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  cleanup_job:
-  #  needs: build
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-    - name: call webhook to delete artifacts
-      env:
-        WEBHOOKS_SECRET: ${{ secrets.WEBHOOKS_SECRET }}
-      run: |
-        echo "::add-mask::$WEBHOOKS_SECRET"
-        curl --verbose --fail --show-error --location --request POST "https://api.github.com/repos/$GITHUB_REPOSITORY/dispatches" --header "Authorization: token $WEBHOOKS_SECRET" --header 'Content-Type: application/json' --header 'Accept: application/vnd.github.everest-preview+json' --data-raw "{ \"event_type\": \"delete_all_artifacts\", \"client_payload\": {\"parent_runid\": \"$GITHUB_RUN_ID\", \"parent_repo\": \"$GITHUB_REPOSITORY\"} }"
+  #cleanup_job:
+  ##  needs: build
+   # if: always()
+    #runs-on: ubuntu-latest
+    #steps:
+    #- name: call webhook to delete artifacts
+     # env:
+      #  WEBHOOKS_SECRET: ${{ secrets.WEBHOOKS_SECRET }}
+      #run: |
+       # echo "::add-mask::$WEBHOOKS_SECRET"
+        #curl --verbose --fail --show-error --location --request POST "https://api.github.com/repos/$GITHUB_REPOSITORY/dispatches" --header "Authorization: token $WEBHOOKS_SECRET" --header 'Content-Type: application/json' --header 'Accept: application/vnd.github.everest-preview+json' --data-raw "{ \"event_type\": \"delete_all_artifacts\", \"client_payload\": {\"parent_runid\": \"$GITHUB_RUN_ID\", \"parent_repo\": \"$GITHUB_REPOSITORY\"} }"
 
   build:
     # The type of runner that the job will run on
