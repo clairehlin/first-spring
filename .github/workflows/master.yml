@@ -41,10 +41,8 @@ jobs:
             mvn --version
             mvn clean install
         
-  
+        # deploy to remote linode server
 
-  # deploy to remote linode server
-  steps:
     - name: Install SSH key
       uses: shimataro/ssh-key-action@v2
       with:
