@@ -27,7 +27,7 @@
         <configuration>
           <runOrder>alphabetical</runOrder>
           <argLine>--illegal-access=permit</argLine>
-          <forkCount>1.0C</forkCount>
+          <forkCount>1C</forkCount>
           <reuseForks>false</reuseForks>
         </configuration>
       </plugin>

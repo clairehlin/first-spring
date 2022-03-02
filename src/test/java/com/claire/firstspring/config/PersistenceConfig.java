@@ -8,7 +8,6 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
@@ -28,14 +27,18 @@ public class PersistenceConfig {
 
     @Bean
     MariaDB4jSpringService mariaDB4jSpringService() {
-       return new MariaDB4jSpringService();
+        long pid = ProcessHandle.current().pid();
+        MariaDB4jSpringService mariaDB4jSpringService = new MariaDB4jSpringService();
+        mariaDB4jSpringService.setDefaultBaseDir("/tmp/MariaDB4j/base-" + pid);
+        mariaDB4jSpringService.setDefaultDataDir("/tmp/MariaDB4j/data-" + pid);
+        return mariaDB4jSpringService;
     }
 
     @Bean
     public DataSource dataSource(MariaDB4jSpringService mariaDB4jSpringService) throws ManagedProcessException {
-        mariaDB4jSpringService.getDB().createDB("test");
 
         DBConfigurationBuilder config = mariaDB4jSpringService.getConfiguration();
+        mariaDB4jSpringService.getDB().createDB("test");
 
         DataSource dataSource = DataSourceBuilder
             .create()
