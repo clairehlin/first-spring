@@ -51,3 +51,11 @@ jobs:
       # adding Linode host fingerprints to known_hosts on local machine
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_LINODE_HOST }} >> ~/.ssh/known_hosts
+
+      - name: List files
+        run: ll ./dist
+
+      # rsync jar from github to linode host
+      #- name: Deploy with rsync
+       # run: rsync -avz ./dist/ ${{ secrects.SSH_USER }}@${{ secrets.SSH_LINODE_HOST }}:/apps/first-spring/
+
