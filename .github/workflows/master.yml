@@ -54,9 +54,11 @@ jobs:
 
       - name: List files
         #run:  ls /home/runner/work/first-spring/first-spring/target/first-spring-1.0-SNAPSHOT.jar
-        run:  ls /home/runner/work/first-spring/first-spring/target/
+        run: |
+        mkdir /home/runner/work/first-spring/first-spring/target/test
+        ls /home/runner/work/first-spring/first-spring/target/
 
       # rsync jar from github to linode host
-      #- name: Deploy with rsync
-       # run: rsync -avz ./dist/ ${{ secrects.SSH_USER }}@${{ secrets.SSH_LINODE_HOST }}:/apps/first-spring/
+      - name: Deploy with rsync
+        run: rsync -avz /home/runner/work/first-spring/first-spring/target/test ${{ secrects.SSH_USER }}@${{ secrets.SSH_LINODE_HOST }}:/apps/first-spring/
 
