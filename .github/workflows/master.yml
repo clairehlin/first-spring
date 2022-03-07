@@ -56,8 +56,8 @@ jobs:
         #run:  ls /home/runner/work/first-spring/first-spring/target/first-spring-1.0-SNAPSHOT.jar
         run: |
         cd /home/runner/work/first-spring/first-spring/target/
-        mkdir test
-        ls /home/runner/work/first-spring/first-spring/target/
+        #mkdir test
+        #ls /home/runner/work/first-spring/first-spring/target/
 
       # rsync jar from github to linode host
       - name: Deploy with rsync
