@@ -53,7 +53,8 @@ jobs:
         run: ssh-keyscan -H ${{ secrets.SSH_LINODE_HOST }} >> ~/.ssh/known_hosts
 
       - name: List files
-        run:  ls /
+        #run:  ls /home/runner/work/first-spring/first-spring/target/first-spring-1.0-SNAPSHOT.jar
+        run:  ls /home/runner/work/first-spring/first-spring/target/
 
       # rsync jar from github to linode host
       #- name: Deploy with rsync
