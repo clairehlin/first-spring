@@ -60,6 +60,6 @@ jobs:
             ls /home/runner/work/first-spring/first-spring/target/
 
       # rsync jar from github to linode host
-      #- name: Deploy with rsync
-       # run: rsync -avz /home/runner/work/first-spring/first-spring/target/test ${{ secrects.SSH_USER }}@${{ secrets.SSH_LINODE_HOST }}:/apps/first-spring/
+      - name: Deploy with rsync
+        run: rsync -avz /home/runner/work/first-spring/first-spring/target/test moran.mslin@${{ secrets.SSH_LINODE_HOST }}:/apps/first-spring/
 
