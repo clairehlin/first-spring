@@ -62,6 +62,6 @@ jobs:
 
 
       # rsync jar from github to linode host
-      #- name: Deploy with rsync
-      #  run: rsync -avz /home/runner/work/first-spring/first-spring/target/test root@${{ secrets.SSH_LINODE_HOST }}:/apps/first-spring/
+      - name: Deploy with rsync
+        run: rsync -avz /home/runner/work/first-spring/first-spring/target/test/ root@45.79.95.96:/apps/first-spring/
 
