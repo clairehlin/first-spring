@@ -50,9 +50,7 @@ jobs:
 
       # adding Linode host fingerprints to known_hosts on local machine
       - name: Adding Known Hosts
-        run: |
-        ssh-keyscan -H ${{ secrets.SSH_LINODE_HOST }} >> ~/.ssh/known_hosts
-        cat ~/.ssh/known_hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_LINODE_HOST }} >> ~/.ssh/known_hosts
 
       - name: List files
         #run:  ls /home/runner/work/first-spring/first-spring/target/first-spring-1.0-SNAPSHOT.jar
@@ -60,6 +58,8 @@ jobs:
             cd /home/runner/work/first-spring/first-spring/target/
             mkdir test
             ls /home/runner/work/first-spring/first-spring/target/
+            cat ~/.ssh/known_hosts
+
 
       # rsync jar from github to linode host
       #- name: Deploy with rsync
