@@ -36,12 +36,9 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Build with Maven
-          run: mvn clean install
-
+        run: mvn clean install
       - name: List files
-          #run:  ls /home/runner/work/first-spring/first-spring/target/first-spring-1.0-SNAPSHOT.jar
-          run: |
-            cd /home/runner/work/first-spring/first-spring/target/
-            vi test.txt
-            ls /home/runner/work/first-spring/first-spring/target/
-
+        run: |
+          cd /home/runner/work/first-spring/first-spring/target/
+          vi test.txt
+          ls /home/runner/work/first-spring/first-spring/target/
