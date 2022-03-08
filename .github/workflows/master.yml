@@ -39,16 +39,12 @@ jobs:
         run: mvn clean install
       - name: List Files
         run: ls -alF /home/runner/work/first-spring/first-spring/target/
-      - name: Create test Files
-        run: echo "this is a test" >> /home/runner/work/first-spring/first-spring/target/test.txt
-      - name: List Files After Creation
-        run: ls -alF /home/runner/work/first-spring/first-spring/target/
       - name: Deploy to Staging Server
         uses: easingthemes/ssh-deploy@main
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           ARGS: "-rltgoDzv0"
-          SOURCE: "target/test.txt"
+          SOURCE: "target/first-spring-1.0-SNAPSHOT.jar"
           REMOTE_HOST: 45.79.95.96
           REMOTE_USER: root
           TARGET: "/apps/first-spring/"
