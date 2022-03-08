@@ -35,7 +35,16 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      #- name: Build with Maven
-       # run: mvn clean install
-      - name: Adding known hosts
-        run: ssh-keyscan -H 45.79.95.96 >> ~/.ssh/known_hosts
+      - name: Build with Maven
+        run: mvn clean install
+      - name: Deploy to Staging Server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-rltgoDzv0"
+          SOURCE: "/home/runner/work/first-spring/first-spring/target/maven-status/"
+          REMOTE_HOST: 45.79.95.96
+          REMOTE_USER: root
+          TARGET: "~/temp/"
+
+
