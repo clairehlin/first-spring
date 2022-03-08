@@ -43,7 +43,7 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           ARGS: "-rltgoDzv0"
-          SOURCE: "target/first-spring-1.0-SNAPSHOT.jar"
+          SOURCE: "target/first-spring-1.0-SNAPSHOT-*.jar"
           REMOTE_HOST: 45.79.95.96
           REMOTE_USER: root
           TARGET: "/apps/first-spring/"
