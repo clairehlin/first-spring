@@ -37,6 +37,8 @@ jobs:
           distribution: 'adopt'
       - name: Build with Maven
         run: mvn clean install
+      - name: List Files
+        run: ls /home/runner/work/first-spring/first-spring/target/
       - name: Deploy to Staging Server
         uses: easingthemes/ssh-deploy@main
         env:
@@ -45,6 +47,6 @@ jobs:
           SOURCE: "/home/runner/work/first-spring/first-spring/target/maven-status/"
           REMOTE_HOST: 45.79.95.96
           REMOTE_USER: root
-          TARGET: "~/temp/"
+          TARGET: "/apps/first-spring/"
 
 
