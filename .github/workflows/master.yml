@@ -36,32 +36,12 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Build with Maven
-        # run: mvn --batch-mode --update-snapshots verify
-        run: |
-            mvn --version
-            mvn clean install
-
-      # install ssh private key to local machine
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_LINODE_PRIVATE_KEY }}
-          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
-
-      # adding Linode host fingerprints to known_hosts on local machine
-      - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.SSH_LINODE_HOST }} >> ~/.ssh/known_hosts
+          run: mvn clean install
 
       - name: List files
-        #run:  ls /home/runner/work/first-spring/first-spring/target/first-spring-1.0-SNAPSHOT.jar
-        run: |
+          #run:  ls /home/runner/work/first-spring/first-spring/target/first-spring-1.0-SNAPSHOT.jar
+          run: |
             cd /home/runner/work/first-spring/first-spring/target/
-            mkdir test
+            vi test.txt
             ls /home/runner/work/first-spring/first-spring/target/
-            cat ~/.ssh/known_hosts
-
-
-      # rsync jar from github to linode host
-      - name: Deploy with rsync
-        run: rsync -avz /home/runner/work/first-spring/first-spring/target/test/ root@45.79.95.96:/apps/first-spring/
 
