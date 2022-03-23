@@ -4,6 +4,8 @@ import com.claire.firstspring.mappers.FeatureMapper;
 import com.claire.firstspring.model.Feature;
 import com.claire.firstspring.service.FeatureService;
 import com.claire.firstspring.web.model.FeatureUpdate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,7 @@ import static java.util.stream.Collectors.toSet;
 @Transactional
 public class FeatureResource {
 
+    private static final Logger log = LoggerFactory.getLogger(FeatureResource.class);
     private final FeatureService featureService;
     private final FeatureMapper featureMapper;
 
@@ -27,6 +30,7 @@ public class FeatureResource {
 
     @GetMapping
     public Set<String> features() {
+        log.info("someone asked for all features");
         return featureService.list()
             .stream()
             .map(featureMapper::toSecond)

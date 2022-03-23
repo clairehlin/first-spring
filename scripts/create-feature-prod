@@ -1,0 +1,1 @@
+curl --verbose -X PUT http://45.79.95.96:8080/features/$1
